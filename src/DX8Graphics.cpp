@@ -195,6 +195,9 @@ void DirectGraphicsClass::ResizeToWindow() {
   WindowView.h = height;
   RenderRect.w = width;
   RenderRect.h = height;
+
+
+  glViewport(WindowView.x, WindowView.y, WindowView.w, WindowView.h); /* Setup our viewport. */
 }
 
 // --------------------------------------------------------------------------------------

@@ -37,7 +37,7 @@ int main() {
           break;
         case SDL_WINDOWEVENT:
           if (ev.window.event == SDL_WINDOWEVENT_RESIZED) {
-            //DirectGraphics.ResizeToWindow();
+            DirectGraphics.ResizeToWindow();
           }
         default:
           break;
