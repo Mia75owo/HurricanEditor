@@ -3,6 +3,7 @@
 #include "DX8Graphics.hpp"
 #include "DX8Texture.hpp"
 #include "Logdatei.hpp"
+#include "SDL_mouse.h"
 #include "Tileengine.hpp"
 #include "Timer.hpp"
 #include "ObjectList.hpp"
@@ -30,7 +31,11 @@ int main() {
   Timer.SetMaxFPS(60);
   Timer.update();
 
-  //ObjectList.LoadAllGraphics();
+  int OldMouseX;
+  int OldMouseY;
+  int MouseX;
+  int MouseY;
+  unsigned int MouseMask;
 
   while (GameRunning) {
     SDL_Event ev;
@@ -43,9 +48,19 @@ int main() {
           if (ev.window.event == SDL_WINDOWEVENT_RESIZED) {
             DirectGraphics.ResizeToWindow();
           }
+          break;
         default:
           break;
       }
+    }
+
+    OldMouseX = MouseX;
+    OldMouseY = MouseY;
+    MouseMask = SDL_GetMouseState(&MouseX, &MouseY);
+
+    if (MouseMask & (SDL_BUTTON_LEFT)) {
+      TileEngine.XOffset += OldMouseX - MouseX;
+      TileEngine.YOffset += OldMouseY - MouseY;
     }
 
     if (KeyDown(SDLK_LEFT)) {

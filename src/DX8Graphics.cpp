@@ -116,7 +116,7 @@ bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, st
         return false;
     }
 
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_ShowCursor(SDL_ENABLE);
 
     // If not using EGL, i.e. using SDL's GL handling, some more handling of
     //  Vsync is necessary now that context has been created:
