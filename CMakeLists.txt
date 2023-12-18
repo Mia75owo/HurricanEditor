@@ -23,8 +23,11 @@ endif()
 set(EDITOR_SOURCES
         src/Main.cpp
 
-        src/Globals.hpp
+        src/ObjectList.cpp
+        src/ObjectList.hpp
+
         src/Globals.cpp
+        src/Globals.hpp
 
         src/Logdatei.cpp
         src/Logdatei.hpp

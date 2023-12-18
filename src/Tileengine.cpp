@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <string>
 #include <algorithm>
+#include "ObjectList.hpp"
 namespace fs = std::filesystem;
 
 #include "DX8Graphics.hpp"
@@ -33,11 +34,9 @@ namespace fs = std::filesystem;
 
 extern Logdatei Protokoll;
 extern TimerClass Timer;
+extern ObjectListClass ObjectList;
 
 //extern DirectGraphicsSprite *pGegnerGrafix[MAX_GEGNERGFX];  // Grafiken  der Gegner
-
-extern float WackelMaximum;
-extern float WackelValue;
 
 D3DCOLOR Col1, Col2, Col3;  // Farben für Wasser/Lava etc
 bool DrawDragon;            // Für den Drachen im Turm Level
@@ -89,13 +88,6 @@ TileEngineClass::TileEngineClass() {
 
     for (int i = 0; i < MAX_LEVELSIZE_X; i++)
         for (int j = 0; j < MAX_LEVELSIZE_Y; j++) {
-            // DKS - Disabled this in favor of memsetting entire array above the loops:
-            // memset (&Tiles[i][j], 0, sizeof (Tiles[i][j]));
-
-            // DKS - Was already commented out in original source:
-            //		 for (int k = 0; k < 3; k++)
-            //			 TileAt(i, j).Color[k] = 0xFFFFFFFF;
-
             LevelTileStruct& tile = Tiles[i][j];
             tile.Red = 255;
             tile.Green = 255;
@@ -106,15 +98,7 @@ TileEngineClass::TileEngineClass() {
         }
 
     for (auto &gfx : TileGfx)
-        // DKS - Adapted to new TexturesystemClass
         gfx.itsTexIdx = -1;
-
-    // DKS - Moved these to the new TileEngineClass::LoadSprites() function (see note there)
-    //// Wasserfall Textur laden
-    // Wasserfall[0].LoadImage("wasserfall.png",  60,  240, 60,  240, 1, 1);
-    // Wasserfall[1].LoadImage("wasserfall2.png", 640, 480, 640, 480, 1, 1);
-    // LiquidGfx[0].LoadImage("water.png", 128, 128, 128, 128, 1, 1);
-    // LiquidGfx[1].LoadImage("water2.png", 128, 128, 128, 128, 1, 1);
 
     // Texturkoordinaten für das Wasser vorberechnen
     for (int i = 0; i < 9; i++) {
@@ -122,12 +106,6 @@ TileEngineClass::TileEngineClass() {
         WasserU[i] = w;
         WasserV[i] = w;
     }
-
-    // DKS - Moved these to the new TileEngineClass::LoadSprites() function (see note there)
-    //// GameOver Schriftzug laden
-    // GameOver.LoadImage("gameover.png", 400, 90, 400, 90, 1, 1);
-    //// Shatten für das Alien Level laden
-    // Shadow.LoadImage ("shadow.png", 512, 512, 512, 512, 1, 1);
 
     WasserfallOffset = 0.0f;
 
@@ -141,36 +119,6 @@ TileEngineClass::TileEngineClass() {
         TileRects[i].right = TileRects[i].left + TILESIZE_X;
         TileRects[i].bottom = TileRects[i].top + TILESIZE_Y;
     }
-
-    /* DKS - Replaced both SinList2 and WaterList lookup tables with new class
-       WaterSinTableClass. See its comments in Tileengine.h for more info.    */
-#if 0
-    int i = 0;
-    float w = 0.0f;
-    while (i < 4000)
-    {
-        /* SinList  [i] = 0.0f; */  //DKS - Disabled this and all eliminated all uses of it,
-                                    // as it was only ever filled with zeroes and had no effect.
-        //DKS - This is to ensure libm should explicitly be called here and not the lookup table:
-        //SinList2 [i] = float (sin(w)) * 5.0f;
-        //WaterList[i] = float (sin(w)) * 2.5f;
-        SinList2 [i] = sinf(w) * 5.0f;
-        WaterList[i] = sinf(w) * 2.5f;
-        w += PI / TILESIZE_X;
-        i++;
-    }
-
-    //SinPos   = 0.0f;      //DKS - unused; disabled
-    SinPos2  = 0.0f;
-    WaterPos = 0.0f;
-#endif  // 0
-
-    // DKS - Lightmap code in original game was never used and all related code has now been disabled:
-    //// LightMaps laden
-    // lightmaps[LIGHTMAP_BLITZ].Load("lightmap_blitz.bmp");
-    // lightmaps[LIGHTMAP_EXPLOSION].Load("lightmap_explosion.bmp");
-    // lightmaps[LIGHTMAP_GOLEMSHOT].Load("lightmap_golem.bmp");
-    // lightmaps[LIGHTMAP_LILA].Load("lightmap_lila.bmp");
 }
 
 // --------------------------------------------------------------------------------------
@@ -179,14 +127,6 @@ TileEngineClass::TileEngineClass() {
 
 TileEngineClass::~TileEngineClass() {}
 
-// DKS - Added initialization function that will load the sprites.
-//      This was necessary since making TileEngineClass a global
-//      static in Main.cpp instead of a dyanmically-allocated pointer.
-//      The class constructor therefore should never load sprites by
-//      itself, since graphics system should be initialized first.
-//      All textures here will be automatically freed by Textures::Exit(),
-//      so no need to worry about the sprite destructors being called in
-//      any specific order (i.e. after graphics system has been shutdown.
 void TileEngineClass::LoadSprites() {
     // Wasserfall Textur laden
     Wasserfall[0].LoadImage("wasserfall.png", 60, 240, 60, 240, 1, 1);
@@ -215,14 +155,7 @@ void TileEngineClass::InitNewLevel(int xSize, int ySize) {
 
     memset(&Tiles, 0, sizeof(Tiles));
 
-    /* DKS - Replaced both SinList2 and WaterList lookup tables with new class
-       WaterSinTableClass. See its comments in Tileengine.h for more info.    */
     WaterSinTable.ResetPosition();
-#if 0
-    //SinPos   = 0.0f;
-    SinPos2  = 0.0f;
-    WaterPos = 0.0f;
-#endif  // 0
 
     DrawDragon = true;
 
@@ -628,10 +561,13 @@ loadfile:
                     default:
                         break;
                 }
+                #endif
 
                 // Gegner laden, wenn er nicht schon geladen wurde
-                LoadGegnerGrafik(LoadObject.ObjectID);
+                ObjectList.LoadObjectGraphic(LoadObject.ObjectID);
+                ObjectList.PushObject(LoadObject.ObjectID, LoadObject.XPos, LoadObject.YPos, LoadObject.Value1, LoadObject.Value2);
 
+        #if 0
                 // Gegner bei aktuellem Skill level überhaupt erzeugen ?
                 if (LoadObject.Skill <= Skill) {
                     Gegner.PushGegner(static_cast<float>(LoadObject.XPos),
@@ -643,7 +579,7 @@ loadfile:
                                           static_cast<float>(LoadObject.YPos + 40), LoadObject.ObjectID,
                                           LoadObject.Value1, LoadObject.Value2, LoadObject.ChangeLight);
                 }
-                #endif
+         #endif
             }
         }
     }

@@ -5,6 +5,7 @@
 #include "Logdatei.hpp"
 #include "Tileengine.hpp"
 #include "Timer.hpp"
+#include "ObjectList.hpp"
 
 bool GameRunning = true;
 std::string g_storage_ext = "/home/mia/code/Editor";
@@ -14,6 +15,7 @@ DirectGraphicsClass DirectGraphics;
 TexturesystemClass Textures;
 TimerClass Timer;
 TileEngineClass TileEngine;
+ObjectListClass ObjectList;
 
 const Uint8 *KeyBuffer;
 int NumberOfKeys;
@@ -27,6 +29,8 @@ int main() {
 
   Timer.SetMaxFPS(60);
   Timer.update();
+
+  //ObjectList.LoadAllGraphics();
 
   while (GameRunning) {
     SDL_Event ev;
@@ -73,6 +77,8 @@ int main() {
 
     TileEngine.DrawBackLevel();
     TileEngine.DrawFrontLevel();
+
+    ObjectList.DrawAllObjects(TileEngine);
 
     DirectGraphics.SetColorKeyMode();
 
