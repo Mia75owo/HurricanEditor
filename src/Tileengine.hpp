@@ -448,7 +448,6 @@ class TileEngineClass {
     int yTileOffs;
     float xScreen;
     float yScreen;
-    float TimelimitSave;  // usprüngliches Zeitlimit
 
     bool bScrollBackground;  // Hintegrundbild scrollen ?
     bool bDrawShadow;            // Taschenlampen Shatten im Alien Level rendern?
@@ -493,8 +492,8 @@ class TileEngineClass {
     float SinPos2;  // Position in der SinusListe für den Wasserhintergrund
 
     DirectGraphicsSprite Background;             // Hintergrund
-    DirectGraphicsSprite ParallaxLayer[3];       // Anzahl der Layer
-    DirectGraphicsSprite GameOver;               // GameOver Symbol
+    //DirectGraphicsSprite ParallaxLayer[3];       // Anzahl der Layer
+    //DirectGraphicsSprite GameOver;               // GameOver Symbol
     DirectGraphicsSprite Wasserfall[2];          // Wasserfall Grafiken
     float WasserfallOffset;                      // Wasserfall Offset
     float XOffset, YOffset;                      // Scrolloffset des Levels
@@ -588,7 +587,6 @@ class TileEngineClass {
         return Tiles[i][j];
     }
 
-    inline void resetTimelimit() { Timelimit = TimelimitSave; }
     int32_t GetUsedPowerBlock() const { return DateiAppendix.UsedPowerblock; }
     const char* GetSong(int i) const { return DateiAppendix.Songs[i]; }
     void ToggleLamp();

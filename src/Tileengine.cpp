@@ -36,8 +36,6 @@ extern Logdatei Protokoll;
 extern TimerClass Timer;
 extern ObjectListClass ObjectList;
 
-//extern DirectGraphicsSprite *pGegnerGrafix[MAX_GEGNERGFX];  // Grafiken  der Gegner
-
 D3DCOLOR Col1, Col2, Col3;  // Farben für Wasser/Lava etc
 bool DrawDragon;            // Für den Drachen im Turm Level
 float ShadowAlpha;
@@ -83,7 +81,6 @@ TileEngineClass::TileEngineClass() {
     TileAnimPhase = 0;
     LoadedTilesets = 0;
 
-    // DKS - Added this:
     memset(Tiles, 0, sizeof(Tiles));
 
     for (int i = 0; i < MAX_LEVELSIZE_X; i++)
@@ -136,7 +133,7 @@ void TileEngineClass::LoadSprites() {
     LiquidGfx[1].LoadImage("water2.png", 128, 128, 128, 128, 1, 1);
 
     // GameOver Schriftzug laden
-    GameOver.LoadImage("gameover.png", 400, 90, 400, 90, 1, 1);
+    //GameOver.LoadImage("gameover.png", 400, 90, 400, 90, 1, 1);
 
     // Shatten für das Alien Level laden
     Shadow.LoadImage("shadow.png", 512, 512, 512, 512, 1, 1);
@@ -170,75 +167,29 @@ void TileEngineClass::InitNewLevel(int xSize, int ySize) {
 // Level freigeben
 // --------------------------------------------------------------------------------------
 
-void TileEngineClass::ClearLevel() {
-    #if 0
-    // Zuerst alle Gegner-Texturen freigeben , damit
-    // nur die geladen werden, die auch benötigt werden
-    // Objekte, die immer benötigt werden, wie Extraleben, Diamanten etc.
-    // werden nicht released
-    for (int i = 4; i < MAX_GEGNERGFX; i++)
-        if (i != PUNISHER && pGegnerGrafix[i] != nullptr)  // Ist eine Textur geladen ?
-        {
-            delete (pGegnerGrafix[i]);  // dann diese löschen
-            pGegnerGrafix[i] = nullptr;    // und auf NULL setzen
-        }
-
-    for (auto &gfx : TileGfx) {
-        Textures.UnloadTexture(gfx.itsTexIdx);
-        gfx.itsTexIdx = -1;
-    }
-
-    Projectiles.ClearAll();
-    PartikelSystem.ClearAll();
-
-    XOffset = 0.0f;
-    YOffset = 0.0f;
-
-    // DKS - Added:
-    // SoundManager.StopAllSongs(false);
-    SoundManager.StopSongs();
-    SoundManager.StopSounds();
-
-    // DKS - Added unloading of Punisher.it music (it is now loaded on-demand in Gegner_Helper.cpp)
-    SoundManager.UnloadSong(MUSIC::PUNISHER);
-    // DKS - Added unloading of flugsack.it music (it is now loaded on-demand in Gegner_Helper.cpp)
-    SoundManager.UnloadSong(MUSIC::FLUGSACK);
-    // DKS - Might as well unload stage & boss music too, although LoadSong() will free any old songs for us
-    SoundManager.UnloadSong(MUSIC::STAGEMUSIC);
-    SoundManager.UnloadSong(MUSIC::BOSS);
-#endif
-}
+void TileEngineClass::ClearLevel() {}
 
 // --------------------------------------------------------------------------------------
 // Level laden
 // --------------------------------------------------------------------------------------
 
 bool TileEngineClass::LoadLevel(const std::string &Filename) {
-    std::string Temp;
     FileHeader DateiHeader;  // Header der Level-Datei
     LevelObjectStruct LoadObject;
 
-    MustCenterPlayer = false;
-
-    IsElevatorLevel = false;
-
     // Dann checken, ob sich das File im Standard Ordner befindet
-    Temp = Filename;
-    if (fs::exists(Temp) && fs::is_regular_file(Temp))
-        goto loadfile;
-
-    Protokoll << "\n-> Error loading level " << Filename << "!" << std::endl;
-    GameRunning = false;
-    return false;
-
-loadfile:
+    if (!fs::exists(Filename) && !fs::is_regular_file(Filename)) {
+        Protokoll << "\n-> Error loading level " << Filename << "!" << std::endl;
+        GameRunning = false;
+        return false;
+    }
 
     Protokoll << "\n-> Loading Level <-\n" << std::endl;
 
     ClearLevel();
 
     // File öffnen
-    std::ifstream Datei(Temp, std::ifstream::binary);
+    std::ifstream Datei(Filename, std::ifstream::binary);
 
     if (!Datei) {
         Protokoll << " \n-> Error loading level !" << std::endl;
@@ -264,16 +215,15 @@ loadfile:
     // Benutzte Hintergrundgrafiken laden
 
     Background.LoadImage(DateiHeader.BackgroundFile, 640, 480, 640, 480, 1, 1);
-    ParallaxLayer[0].LoadImage(DateiHeader.ParallaxAFile, 640, 480, 640, 480, 1, 1);
-    ParallaxLayer[1].LoadImage(DateiHeader.ParallaxBFile, 640, 480, 640, 480, 1, 1);
-    CloudLayer.LoadImage(DateiHeader.CloudFile, 640, 240, 640, 240, 1, 1);
-    Timelimit = static_cast<float>(FixEndian(DateiHeader.Timelimit));
+    //ParallaxLayer[0].LoadImage(DateiHeader.ParallaxAFile, 640, 480, 640, 480, 1, 1);
+    //ParallaxLayer[1].LoadImage(DateiHeader.ParallaxBFile, 640, 480, 640, 480, 1, 1);
+    //CloudLayer.LoadImage(DateiHeader.CloudFile, 640, 240, 640, 240, 1, 1);
+    //Timelimit = static_cast<float>(FixEndian(DateiHeader.Timelimit));
     DateiHeader.NumObjects = FixEndian(DateiHeader.NumObjects);
 
     if (Timelimit <= 0.0f)
         Timelimit = 500.0f;
 
-    TimelimitSave = Timelimit;
     MaxSecrets = 0;
     MaxDiamonds = 0;
     MaxOneUps = 0;
@@ -321,7 +271,6 @@ loadfile:
         }
 
     // eventuelle Schrägen ermitteln und Ecken für die Wasseranim festlegen
-    // EDIT_ME wieder reinmachen und diesmal richtig machen =)
 
     for (int i = 1; i < LEVELSIZE_X - 1; i++)
         for (int j = 2; j < LEVELSIZE_Y - 1; j++) {
@@ -391,7 +340,6 @@ loadfile:
                 ScrolltoX = XOffset;
                 ScrolltoY = YOffset;
             } else {
-                #if 0
                 // Gegner und andere Objekte laden und ins Level setzen
                 switch (LoadObject.ObjectID) {
                     // Count Secrets, OneUps etc., for Summary-Box
@@ -408,178 +356,13 @@ loadfile:
                         MaxBlocks++;
                         break;
 
-                    case SPITTERBOMBE:
-                        // Spitter laden, wenn die Spitterbombe geladen wird
-                        LoadGegnerGrafik(SPITTER);
-                        break;
-
-                    case RIESENPIRANHA:
-                        // Kleinen Piranha laden, wenn der Riesen Piranha geladen wird
-                        LoadGegnerGrafik(PIRANHA);
-                        break;
-
-                    case NEST:
-                        // Mücke laden, wenn das Nest geladen wird
-                        LoadGegnerGrafik(STAHLMUECKE);
-                        break;
-
-                    case KUGELRIESIG:
-                    case KUGELGROSS:
-                    case KUGELMEDIUM:
-                        // Kleine Kugeln laden, wenn eine grosse geladen wird
-                        LoadGegnerGrafik(KUGELGROSS);
-                        LoadGegnerGrafik(KUGELMEDIUM);
-                        LoadGegnerGrafik(KUGELKLEIN);
-                        break;
-
-                    case FAHRSTUHLBOSS:
-                        // Boulder und Stelzsack laden, wenn der Fahrstuhlendboss geladen wird
-                        LoadGegnerGrafik(BOULDER);
-                        LoadGegnerGrafik(STELZSACK);
-                        break;
-
-                    case LAVABALLSPAWNER:
-                        // lava Ball laden, wenn dessen Spawner geladen wird
-                        LoadGegnerGrafik(LAVABALL);
-                        break;
-
-                    case BRATKLOPS:
-                    case PARTIKELSPAWN:
-                        // Made laden, wenn der Bratklops oder der Partikelspawner geladen wird
-                        LoadGegnerGrafik(MADE);
-                        break;
-
-                    case SHRINE:
-                        // Steine laden, wenn der Schrein geladen wird
-                        LoadGegnerGrafik(FALLINGROCK);
-                        break;
-
-                    case SHOOTPLATTFORM:
-                        // ShootButton laden, wenn die entsprechende Plattform geladen wird
-                        LoadGegnerGrafik(SHOOTBUTTON);
-                        break;
-
-                    case SCHWABBEL:
-                        // Made laden, wenn der Schwabbelsack geladen wird
-                        LoadGegnerGrafik(MADE);
-                        break;
-
-                    case METALHEAD:
-                        // Boulder laden, wenn der MetalHead Boss geladen wird
-                        LoadGegnerGrafik(BOULDER);
-                        break;
-
-                    case SCHLEIMMAUL:
-                        // Schleimbollen laden, wenn das Schleimmaul geladen wird
-                        LoadGegnerGrafik(SCHLEIMALIEN);
-                        break;
-
-                    case WUXESPINNEN:
-                        // Mittelgroße Spinne laden, wenn der Spinnen Ansturm geladen wird
-                        LoadGegnerGrafik(MITTELSPINNE);
-                        break;
-
-                    case GOLEM:
-                        // Blauen Boulder laden, wenn der Golem geladen wird
-                        LoadGegnerGrafik(BOULDER);
-                        break;
-
-                    case SPINNENMASCHINE:
-                        // Climbspider laden, wenn die Spinnenmaschine geladen wird
-                        LoadGegnerGrafik(CLIMBSPIDER);
-                        // Drone laden, wenn die Spinnenmaschine geladen wird
-                        LoadGegnerGrafik(DRONE);
-                        break;
-
-                    case PRESSWURST:
-                        // Fette Spinne laden, wenn die Spinnen Presswurst geladen wird
-                        LoadGegnerGrafik(FETTESPINNE);
-                        break;
-
-                    case LAFASSSPAWNER:
-                        // La Fass laden, wenn der La Fass Spawner geladen wird
-                        LoadGegnerGrafik(LAFASS);
-                        break;
-
-                    case STACHELBEERE:
-                        // Minirakete laden, wenn Stachelbeere geladen wird
-                        LoadGegnerGrafik(MINIROCKET);
-                        break;
-
-                    case RIESENSPINNE:
-                    case UFO:
-                    case SKELETOR:
-                    case DRACHE:
-                        // Fette Rakete laden, wenn Riesenspinne oder Drache geladen wird
-                        LoadGegnerGrafik(FETTERAKETE);
-
-                        if (LoadObject.ObjectID == RIESENSPINNE) {
-                            // Spinnenbombe laden, wenn die Riesenspinne geladen wird
-                            LoadGegnerGrafik(SPIDERBOMB);
-                        }
-
-                        // Minidragon laden, wenn Drache geladen wird
-                        if (LoadObject.ObjectID == DRACHE) {
-                            LoadGegnerGrafik(MINIDRAGON);
-
-                            // Drache wird geladen?
-                            if (LoadObject.Value2 == 0)
-                                pDragonHack = new CDragonHack();
-                        }
-
-                        // Skull laden, wenn der Skeletor geladen wird
-                        if (LoadObject.ObjectID == SKELETOR) {
-                            LoadGegnerGrafik(SKULL);
-                        }
-                        break;
-
-                    case SCHNEEKOENIG:
-                        // Schneekoppe laden, wenn der Schneekönig geladen wird
-                        LoadGegnerGrafik(SCHNEEKOPPE);
-                        break;
-
-                    case BIGFISH:
-                        // Ein Paar Gegner laden, wenn der BigFish geladen wird
-                        LoadGegnerGrafik(PIRANHA);
-                        LoadGegnerGrafik(SWIMWALKER);
-                        LoadGegnerGrafik(KUGELKLEIN);
-                        LoadGegnerGrafik(KUGELMEDIUM);
-                        LoadGegnerGrafik(KUGELGROSS);
-                        LoadGegnerGrafik(KUGELRIESIG);
-                        break;
-
-                    case ROLLMOPS:
-                        // Kettenglied laden, wenn der Rollmops geladen wird
-                        LoadGegnerGrafik(KETTENGLIED);
-                        break;
-
-                    case TUBE:
-                        // Mutant laden, wenn die Tube geladen wird
-                        LoadGegnerGrafik(MUTANT);
-                        break;
-
                     default:
                         break;
                 }
-                #endif
 
                 // Gegner laden, wenn er nicht schon geladen wurde
                 ObjectList.LoadObjectGraphic(LoadObject.ObjectID);
                 ObjectList.PushObject(LoadObject.ObjectID, LoadObject.XPos, LoadObject.YPos, LoadObject.Value1, LoadObject.Value2);
-
-        #if 0
-                // Gegner bei aktuellem Skill level überhaupt erzeugen ?
-                if (LoadObject.Skill <= Skill) {
-                    Gegner.PushGegner(static_cast<float>(LoadObject.XPos),
-                                      static_cast<float>(LoadObject.YPos), LoadObject.ObjectID,
-                                      LoadObject.Value1, LoadObject.Value2, LoadObject.ChangeLight);
-
-                    if (LoadObject.ObjectID == REITFLUGSACK && NUMPLAYERS == 2)
-                        Gegner.PushGegner(static_cast<float>(LoadObject.XPos + 60),
-                                          static_cast<float>(LoadObject.YPos + 40), LoadObject.ObjectID,
-                                          LoadObject.Value1, LoadObject.Value2, LoadObject.ChangeLight);
-                }
-         #endif
             }
         }
     }
@@ -610,7 +393,6 @@ loadfile:
     int const ColA2 = std::stoi(std::string(&DateiAppendix.Col2[6], 2), nullptr, 16);
 
     Col1 = D3DCOLOR_RGBA(ColR1, ColG1, ColB1, ColA1);
-
     Col2 = D3DCOLOR_RGBA(ColR2, ColG2, ColB2, ColA2);
 
     ColR3 = ColR1 + ColR2 + 32;
@@ -660,11 +442,6 @@ void TileEngineClass::CalcRenderRange() {
     int xo = static_cast<int>(XOffset * (1.0f / TILESIZE_X));
     int yo = static_cast<int>(YOffset * (1.0f / TILESIZE_Y));
 
-    /* CHECKME: Without the following checks the game
-       in places like start of level 2 for a short
-       time renders areas outside map which can cause
-       crashes (random non existing textures). (stegerg) */
-
     if (xo < 0)
         xo = 0;
     if (yo < 0)
@@ -687,7 +464,6 @@ void TileEngineClass::CalcRenderRange() {
     if (yo + RenderPosYTo > LEVELSIZE_Y)
         RenderPosYTo = ScreenSizeTiles_Y;
 
-    // DKS - Added:
     if (xo + RenderPosXTo > LEVELSIZE_X)
         RenderPosXTo = LEVELSIZE_X - xo;
     if (yo + RenderPosYTo > LEVELSIZE_Y)
@@ -701,7 +477,6 @@ void TileEngineClass::CalcRenderRange() {
     xTileOffs = static_cast<int>(XOffset) % TILESIZE_X;
     yTileOffs = static_cast<int>(YOffset) % TILESIZE_Y;
 
-    // DKS - Update the new water sin table indexes before rendering any tiles:
     WaterSinTable.UpdateTableIndexes(xLevel, yLevel);
 }
 
@@ -833,7 +608,6 @@ void TileEngineClass::DrawBackground() {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::DrawBackLevel() {
-
     // Am Anfang noch keine Textur gewählt
     int ActualTexture = -1;
 
@@ -931,12 +705,6 @@ void TileEngineClass::DrawBackLevel() {
                     float x_offs[2];
                     WaterSinTable.GetNonWaterSin(j, x_offs);
 
-                    // DKS - Fixed out of bounds access to Tiles[][] array on y here:
-                    //      When yLevel is 1 and j is -1 (indicating that the one-tile overdraw
-                    //      border is being drawn on the top screen edge), this was ending up
-                    //      trying to access a row higher than the top screen border which doesn't
-                    //      exist. Loading the Eis map (level 7) would crash on some machines.
-                    // if (TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)                    // Original line
                     if (yLevel + j > 0 &&  // DKS Added this check to above line
                         TileAt(xLevel + i, yLevel + j - 1).Block & BLOCKWERT_LIQUID) {
                         if (tile.move_v1 == true)
@@ -975,7 +743,6 @@ void TileEngineClass::DrawBackLevel() {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::DrawFrontLevel() {
-
     // Am Anfang noch keine Textur gewählt
     int ActualTexture = -1;
 
@@ -987,10 +754,6 @@ void TileEngineClass::DrawFrontLevel() {
 
     // Noch keine Tiles zum rendern
     int NumToRender = 0;
-
-    // DKS - WaterList lookup table has been replaced with WaterSinTableClass,
-    //      see comments for it in Tileengine.h
-    // int off = 0;
 
     for (int j = RenderPosY; j < RenderPosYTo; j++) {
         xScreen = static_cast<float>(-xTileOffs + RenderPosX * TILESIZE_X);
@@ -1075,40 +838,11 @@ void TileEngineClass::DrawFrontLevel() {
                 v4.tv = tu;
 
                 // Hintergrund des Wasser schwabbeln lassen
-
-                // DKS - WaterList lookup table has been replaced with WaterSinTableClass,
-                //      see comments for it in Tileengine.h
-#if 0
-                off = (static_cast<int>(SinPos2) + (yLevel * 2) % 40 + j*2) % 1024;
-
-                //DKS - Fixed out of bounds access to Tiles[][] array on y here:
-                //      When yLevel is 1 and j is -1 (indicating that the one-tile overdraw
-                //      border is being drawn on the top screen edge), this was ending up
-                //      trying to access a row higher than the top screen border which doesn't
-                //      exist. Loading the Eis map (level 7) would crash on some machines.
-                //if (TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)                    // Original line
-                if (yLevel+j > 0 &&    // DKS Added this check to above line
-                        TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)
-                {
-                    if (TileAt(xLevel+i, yLevel+j).move_v1 == true) v1.x += SinList2[off];
-                    if (TileAt(xLevel+i, yLevel+j).move_v2 == true) v2.x += SinList2[off];
-                }
-
-                if (TileAt(xLevel+i, yLevel+j).move_v3 == true) v3.x += SinList2[off + 2];
-                if (TileAt(xLevel+i, yLevel+j).move_v4 == true) v4.x += SinList2[off + 2];
-#endif  // 0
-
                 if (tile.move_v1 || tile.move_v2 ||
                     tile.move_v3 || tile.move_v4) {
                     float x_offs[2];
                     WaterSinTable.GetNonWaterSin(j, x_offs);
 
-                    // DKS - Fixed out of bounds access to Tiles[][] array on y here:
-                    //      When yLevel is 1 and j is -1 (indicating that the one-tile overdraw
-                    //      border is being drawn on the top screen edge), this was ending up
-                    //      trying to access a row higher than the top screen border which doesn't
-                    //      exist. Loading the Eis map (level 7) would crash on some machines.
-                    // if (TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)                    // Original line
                     if (yLevel + j > 0 &&  // DKS Added this check to above line
                         TileAt(xLevel + i, yLevel + j - 1).Block & BLOCKWERT_LIQUID) {
                         if (tile.move_v1 == true)
@@ -1139,7 +873,6 @@ void TileEngineClass::DrawFrontLevel() {
     }
 
     if (NumToRender > 0)
-
         DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
 }
 
@@ -1287,9 +1020,6 @@ void TileEngineClass::DrawOverlayLevel() {
 
     // Noch keine Tiles zum rendern
     int NumToRender = 0;
-    // int al;
-    // DKS - Variable was unused in original source, disabled:
-    // int off = 0;
 
     for (int j = RenderPosY; j < RenderPosYTo; j++) {
         xScreen = static_cast<float>(-xTileOffs + RenderPosX * TILESIZE_X);
@@ -1383,9 +1113,6 @@ void TileEngineClass::DrawOverlayLevel() {
                         v1.color = v2.color = v3.color = v4.color =
                             D3DCOLOR_RGBA(255, 255, 255, tile.Alpha);
                     }
-
-                    // DKS - Variable was unused in original source, disabled:
-                    // off = (static_cast<int>(SinPos2) + (yLevel * 2) % 40 + j*2) % 1024;
 
                     v1.x = l;  // Links oben
                     v1.y = o;
@@ -1590,7 +1317,6 @@ void TileEngineClass::DrawWater() {
                     //
 
                     // Schicht 1
-                    //
                     int xoff = (i + xLevel) % 3 * TILESIZE_X;
                     int yoff = (j + yLevel) % 3 * TILESIZE_Y + 120 - static_cast<int>(WasserfallOffset);
 
@@ -1645,11 +1371,6 @@ void TileEngineClass::CheckBounds() {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::WertAngleichen(float &nachx, float &nachy, float vonx, float vony) {
-    //	nachx = static_cast<float>(static_cast<int>(vonx));
-    //	nachy = static_cast<float>(static_cast<int>(vony));
-
-    //	return;
-
     float const rangex = std::clamp(vonx - nachx, -50.0f, 50.0f);
     float const rangey = std::clamp(vony - nachy, -60.0f, 60.0f);
 
@@ -2076,85 +1797,11 @@ bool TileEngineClass::BlockDestroyUnten(float x, float y, float xo, float yo, RE
 
     return false;
 }
-// DKS - END BLOCK OF NEW FUNCTIONS
 
 // --------------------------------------------------------------------------------------
 // Auf Schrägen prüfen
 // --------------------------------------------------------------------------------------
-// DKS - Rewrote this function to not access Tiles[][] array out of bounds, and to be
-//      a bit more efficient and clean. It also now only take parameters that it actually
-//      needs (xo/yo params were unused) and x parameter didn't need to be a reference.
-//      It returns the correct type for Block data as well (uint32_t vs int).
-// ORIGINAL CODE:
-#if 0
-int	TileEngineClass::BlockSlopes(float &x, float &y, float &xo, float &yo, RECT_struct rect, float ySpeed, bool resolve)
-{
-    int Art	= 0;
-    int xlevel;
-    int ylevel;
-    //int laenge;
 
-    //laenge = static_cast<int>(y - yo)+1;
-    //laenge = 5;
-
-    for(int j = rect.bottom; j<rect.bottom+TILESIZE_Y; j++)
-    {
-        // Schräge links
-        // von links anfangen mit der Block-Prüdung
-        //
-        for(int i = rect.left; i<rect.right; i+=1)
-        {
-            xlevel = int ((x + i) * 0.05f);
-            ylevel = int ((y + j - 1) * 0.05f);
-
-            Art = TileAt(xlevel, ylevel).Block;
-
-            if (Art & BLOCKWERT_SCHRAEGE_L)
-            {
-                float newy = (ylevel+1) * TILESIZE_Y - rect.bottom - (TILESIZE_Y - float (int (x + i) % TILESIZE_X)) - 1;
-
-                {
-                    if (ySpeed == 0.0f ||
-                            y > newy)
-                    {
-                        y = newy;
-                        return Art;
-                    }
-                }
-            }
-        }
-
-        // Schräge rechts
-        // von rechts anfangen mit der Block-Prüdung
-        //
-        for(int i = rect.right; i>rect.left; i-=1)
-        {
-            xlevel = int ((x + i) * 0.05f);
-            ylevel = int ((y + j - 1) * 0.05f);
-
-            Art = TileAt(xlevel, ylevel).Block;
-
-
-            if (Art & BLOCKWERT_SCHRAEGE_R)
-            {
-                float newy = (ylevel+1) * TILESIZE_Y - rect.bottom - (float (int (x + i) % TILESIZE_X)) - 1;
-
-                {
-                    if (ySpeed == 0.0f ||
-                            y > newy)
-                    {
-                        y = newy;
-                        return Art;
-                    }
-                }
-            }
-        }
-    }
-
-    return 0;
-}
-#endif  // 0
-// DKS - Rewritten version of above function:
 uint32_t TileEngineClass::BlockSlopes(const float x, float &y, const RECT_struct rect, const float ySpeed) {
 
     for (int j = rect.bottom; j < rect.bottom + TILESIZE_Y; j++) {
@@ -2221,8 +1868,7 @@ uint32_t TileEngineClass::BlockSlopes(const float x, float &y, const RECT_struct
 // Checken ob ein Schuss eine zerstörbare Wand getroffen hat und wenn ja, diese
 // zerstören und true zurückliefern, damit der Schuss ebenfalls gelöscht wird
 // --------------------------------------------------------------------------------------
-bool TileEngineClass::CheckDestroyableWalls(float x, float y, float xs, float ys, RECT_struct rect)
-{
+bool TileEngineClass::CheckDestroyableWalls(float x, float y, float xs, float ys, RECT_struct rect) {
     // Ausserhalb vom Level?
     //
     if (x < 0 || x > LEVELPIXELSIZE_X ||
@@ -2263,11 +1909,6 @@ D3DCOLOR TileEngineClass::LightValue(float x, float y, RECT_struct rect, bool fo
     int const x_level = static_cast<int>((x + (rect.right - rect.left) / 2) / TILESIZE_X);  // xPosition im Level
     int const y_level = static_cast<int>((y + (rect.bottom - rect.top) / 2) / TILESIZE_Y);  // yPosition im Level
 
-    // DKS - Added check for x_level,y_level being in bounds of levels' dimensions, also,
-    //      check forced==false before blindly looking up block value:
-    // if (!(TileAt(x_level, y_level).Block & BLOCKWERT_LIGHT) &&		// Soll das Leveltile garnicht
-    //        forced == false)
-    //    return 0xFFFFFFFF;										// das Licht des Objektes ändern
     if ((x_level >= LEVELSIZE_X || y_level >= LEVELSIZE_Y) ||
         (!forced && !(TileAt(x_level, y_level).Block & BLOCKWERT_LIGHT)))  // Soll das Leveltile garnicht
         return 0xFFFFFFFF;                                               // das Licht des Objektes ändern
