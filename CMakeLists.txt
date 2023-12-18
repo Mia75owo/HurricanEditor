@@ -66,12 +66,6 @@ list(APPEND EDITOR_SOURCES
 
 include(CMakeDependentOption)
 
-#ADD_DEFINITIONS(-DUSE_FBO)
-#list(APPEND EDITOR_SOURCES
-    #src/SDLPort/cfbo.cpp
-    #src/SDLPort/cfbo.hpp
-#)
-
 ADD_DEFINITIONS(-DUSE_FAST_RNG)
 
 if(UNIX)

@@ -179,10 +179,6 @@ bool DirectGraphicsClass::Exit() {
     Shaders[PROGRAM_TEXTURE].Close();
     Shaders[PROGRAM_RENDER].Close();
 
-#if defined(USE_FBO)
-    RenderBuffer.Close();
-#endif /* USE_FBO */
-
     SDL_GL_DeleteContext(GLcontext);
     SDL_DestroyWindow(Window);
     SDL_Quit();
@@ -280,10 +276,6 @@ bool DirectGraphicsClass::SetDeviceInfo() {
     matProjRender = glm::ortho(0.0f, static_cast<float>(RenderView.w), static_cast<float>(RenderView.h), 0.0f, 0.0f, 1.0f);
 
     matProj = matProjWindow;
-
-#if defined(USE_FBO)
-    SelectBuffer(true);
-#endif
 
     return true;
 }
@@ -449,45 +441,6 @@ void DirectGraphicsClass::SetTexture(int idx) {
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::ShowBackBuffer() {
-#if defined(USE_FBO)
-    if (RenderBuffer.IsEnabled()) {
-        VERTEX2D vertices[4];
-
-        // Protokoll << std::dec << RenderRect.w << "x" << RenderRect.h << " at " << RenderRect.x << "x" << RenderRect.y
-        // << std::endl;
-
-        vertices[0].x = RenderRect.x;
-        vertices[0].y = RenderRect.y + RenderRect.h; /* lower left */
-        vertices[1].x = RenderRect.x;
-        vertices[1].y = RenderRect.y; /* upper left */
-        vertices[2].x = RenderRect.x + RenderRect.w;
-        vertices[2].y = RenderRect.y + RenderRect.h; /* lower right */
-        vertices[3].x = RenderRect.x + RenderRect.w;
-        vertices[3].y = RenderRect.y; /* upper right */
-        vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = 0xFFFFFFFF;
-
-        vertices[0].tu = 0;
-        vertices[0].tv = 0; /* lower left */
-        vertices[1].tu = 0;
-        vertices[1].tv = 1; /* upper left */
-        vertices[2].tu = 1;
-        vertices[2].tv = 0; /* lower right */
-        vertices[3].tu = 1;
-        vertices[3].tv = 1; /* upper right */
-
-        SelectBuffer(false);
-
-        use_shader = CrtEnabled ? shader_t::RENDER : shader_t::TEXTURE;
-        RenderBuffer.BindTexture(true);
-
-        RendertoBuffer(GL_TRIANGLE_STRIP, 2, &vertices[0]);
-
-        use_shader = shader_t::COLOR;
-        RenderBuffer.BindTexture(false);
-
-    }
-#endif
-
     SDL_GL_SwapWindow(Window);
 
 #ifndef NDEBUG
@@ -497,10 +450,6 @@ void DirectGraphicsClass::ShowBackBuffer() {
         Protokoll << "GL Error " << std::hex << error << " file " << __FILE__ << ": line " << std::dec << __LINE__
                   << std::endl;
     }
-#endif
-
-#if defined(USE_FBO)
-    SelectBuffer(true);
 #endif
 }
 
@@ -519,35 +468,11 @@ void DirectGraphicsClass::SetupFramebuffers() {
     RenderView.w = RenderWidth;
     RenderView.h = RenderHeight;
 
-#if defined(USE_FBO)
-    /* Create an FBO for rendering */
-    RenderBuffer.Open(RenderView.w, RenderView.h);
-
-    if (RenderBuffer.IsEnabled()) {
-        /* Set the render viewport */
-        SelectBuffer(true);
-        glViewport(RenderView.x, RenderView.y, RenderView.w, RenderView.h);
-        SelectBuffer(false);
-        Protokoll << "Render viewport resolution: " << RenderView.w << "x" << RenderView.h << " at " << RenderView.x
-                  << "x" << RenderView.y << std::endl;
-
-        /* Fill the whole screen area */
-        RenderRect.w = WindowView.w;
-        RenderRect.h = WindowView.h;
-        RenderRect.x = 0;
-        RenderRect.y = 0;
-
-        Protokoll << "Render area: " << RenderRect.w << "x" << RenderRect.h << " at " << RenderRect.x << "x"
-                  << RenderRect.y << std::endl;
-    } else
-#endif
-    {
-        /* No scaling just center the rendering in the window */
-        WindowView.x = 0;
-        WindowView.y = 0;
-        WindowView.w = RenderView.w;
-        WindowView.h = RenderView.h;
-    }
+    /* No scaling just center the rendering in the window */
+    WindowView.x = 0;
+    WindowView.y = 0;
+    WindowView.w = RenderView.w;
+    WindowView.h = RenderView.h;
 
     glViewport(WindowView.x, WindowView.y, WindowView.w, WindowView.h); /* Setup our viewport. */
     Protokoll << "Window viewport: " << WindowView.w << "x" << WindowView.h << " at " << WindowView.x << "x"
@@ -555,31 +480,5 @@ void DirectGraphicsClass::SetupFramebuffers() {
 }
 
 void DirectGraphicsClass::ClearBackBuffer() {
-#if defined(USE_FBO)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
-
     glClear(GL_COLOR_BUFFER_BIT);
-
-#if defined(USE_FBO)
-    glBindFramebuffer(GL_FRAMEBUFFER, RenderBuffer.GetFramebuffer());
-    glClear(GL_COLOR_BUFFER_BIT);
-#endif
 }
-
-#if defined(USE_FBO)
-void DirectGraphicsClass::SelectBuffer(bool active) {
-    if (RenderBuffer.IsEnabled()) {
-        if (active) {
-            glBindFramebuffer(GL_FRAMEBUFFER, RenderBuffer.GetFramebuffer());
-            glViewport(RenderView.x, RenderView.y, RenderView.w, RenderView.h);
-            matProj = matProjRender;
-        } else {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glViewport(WindowView.x, WindowView.y, WindowView.w, WindowView.h);
-            g_matModelView = glm::mat4x4(1.0f);
-            matProj = matProjWindow;
-        }
-    }
-}
-#endif /* USE_FBO */

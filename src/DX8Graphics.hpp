@@ -20,9 +20,6 @@
 #include "SDL_port.hpp"
 #if defined(USE_GL2) || defined(USE_GL3)
 #  include "cshader.hpp"
-#  if defined(USE_FBO)
-#    include "cfbo.hpp"
-#  endif /* USE_FBO */
 #endif /* USE_GL2 || USE_GL3 */
 
 // --------------------------------------------------------------------------------------
@@ -92,9 +89,6 @@ class DirectGraphicsClass {
     SDL_Rect WindowView;
     SDL_Rect RenderView;
     SDL_Rect RenderRect;
-#if defined(USE_FBO)
-    CFbo RenderBuffer;
-#endif
 
   public:
     int RenderWidth;
