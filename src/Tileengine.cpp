@@ -21,7 +21,6 @@ namespace fs = std::filesystem;
 
 #include "DX8Graphics.hpp"
 #include "DX8Sprite.hpp"
-#include "DX8Texture.hpp"
 #include "Globals.hpp"
 #include "Logdatei.hpp"
 #include "Tileengine.hpp"
@@ -454,7 +453,10 @@ loadfile:
 
             // Startposition des Spielers
             if (LoadObject.ObjectID == 0) {
-                UpdateLevel();
+                XOffset = static_cast<float>(LoadObject.XPos) - static_cast<float>(DirectGraphics.RenderWidth) / 2;
+                YOffset = static_cast<float>(LoadObject.YPos) - static_cast<float>(DirectGraphics.RenderHeight) / 2;
+                ScrolltoX = XOffset;
+                ScrolltoY = YOffset;
             } else {
                 #if 0
                 // Gegner und andere Objekte laden und ins Level setzen
@@ -714,6 +716,8 @@ void TileEngineClass::SetScrollSpeed(float xSpeed, float ySpeed) {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::CalcRenderRange() {
+    ScreenSizeTiles_X = DirectGraphics.RenderWidth / TILESIZE_X;
+    ScreenSizeTiles_Y = DirectGraphics.RenderHeight / TILESIZE_Y;
 
     // Ausschnittgröße berechnen
     //
@@ -739,13 +743,13 @@ void TileEngineClass::CalcRenderRange() {
     if (RenderPosY + yo < 0)
         RenderPosY = 0;
 
-    RenderPosXTo = SCREENSIZE_X + 2;
-    RenderPosYTo = SCREENSIZE_Y + 2;
+    RenderPosXTo = ScreenSizeTiles_X + 2;
+    RenderPosYTo = ScreenSizeTiles_Y + 2;
 
     if (xo + RenderPosXTo > LEVELSIZE_X)
-        RenderPosXTo = SCREENSIZE_X;
+        RenderPosXTo = ScreenSizeTiles_X;
     if (yo + RenderPosYTo > LEVELSIZE_Y)
-        RenderPosYTo = SCREENSIZE_Y;
+        RenderPosYTo = ScreenSizeTiles_Y;
 
     // DKS - Added:
     if (xo + RenderPosXTo > LEVELSIZE_X)
@@ -770,6 +774,7 @@ void TileEngineClass::CalcRenderRange() {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::DrawBackground() {
+    #if 0
 
     // Hintergrund nicht rotieren
     //
@@ -800,7 +805,7 @@ void TileEngineClass::DrawBackground() {
     //----- Layer ganz hinten (ausser im Flugsack Level)
 
     xoff = static_cast<int>(XOffset / 3.0f) % RENDERWIDTH;
-    yoff = static_cast<float>((LEVELSIZE_Y - SCREENSIZE_Y) * TILESIZE_Y);  // Grösse des Levels in Pixeln (-1 Screen)
+    yoff = static_cast<float>((LEVELSIZE_Y - ScreenSizeTiles_Y) * TILESIZE_Y);  // Grösse des Levels in Pixeln (-1 Screen)
     yoff = 220.0f - 150.0f / yoff * YOffset;                               // y-Offset des Layers berechnen
     yoff -= 40.0f;
 
@@ -814,7 +819,7 @@ void TileEngineClass::DrawBackground() {
 
     //----- vorletzter Layer
 
-    yoff = static_cast<float>((LEVELSIZE_Y - SCREENSIZE_Y) * TILESIZE_Y);  // Grösse des Levels in Pixeln (-1 Screen)
+    yoff = static_cast<float>((LEVELSIZE_Y - ScreenSizeTiles_Y) * TILESIZE_Y);  // Grösse des Levels in Pixeln (-1 Screen)
     yoff = 200.0f - 200.0f / yoff * YOffset;                               // y-Offset des Layers berechnen
     xoff = static_cast<int>(XOffset / 2.0f) % RENDERWIDTH;
 
@@ -850,7 +855,7 @@ void TileEngineClass::DrawBackground() {
     DirectGraphics.SetAdditiveMode();
 
     xoff = static_cast<int>(XOffset / 4.0f + CloudMovement) % RENDERWIDTH;
-    yoff = static_cast<float>((LEVELSIZE_Y - SCREENSIZE_Y) * 40);  // Grösse des Levels in Pixeln (-1 Screen)
+    yoff = static_cast<float>((LEVELSIZE_Y - ScreenSizeTiles_Y) * 40);  // Grösse des Levels in Pixeln (-1 Screen)
     yoff = 240.0f / yoff * YOffset;               // y-Offset des Layers berechnen
 
     // Linke Hälfte
@@ -860,6 +865,18 @@ void TileEngineClass::DrawBackground() {
     // Rechte Hälfte
     CloudLayer.SetRect(xoff, static_cast<int>(yoff), RENDERWIDTH, 240);
     CloudLayer.RenderSprite(0.0f, 0.0f, 0xFFFFFFFF);
+
+    DirectGraphics.SetColorKeyMode();
+#endif
+
+    // Hintergrund nicht rotieren
+    glm::mat4x4 matView = glm::mat4x4(1.0f);
+    g_matView = matView;
+
+    //----- Hintergrund-Bild
+
+    Background.SetRect(0, 0, RENDERWIDTH, RENDERHEIGHT);
+    Background.RenderSpriteScaled(0.0f, 0.0f, DirectGraphics.RenderWidth, DirectGraphics.RenderHeight, 0xFFFFFFFF);
 
     DirectGraphics.SetColorKeyMode();
 }
@@ -893,10 +910,6 @@ void TileEngineClass::DrawBackLevel() {
     // Noch keine Tiles zum rendern
     int NumToRender = 0;
 
-    // DKS - WaterList lookup table has been replaced with WaterSinTableClass,
-    //      see comments for it in Tileengine.h
-    // int off  = 0;
-
     for (int j = RenderPosY; j < RenderPosYTo; j++) {
         xScreen = static_cast<float>(-xTileOffs) + RenderPosX * TILESIZE_X;
 
@@ -920,6 +933,11 @@ void TileEngineClass::DrawBackLevel() {
                     DirectGraphics.SetTexture(TileGfx[ActualTexture].itsTexIdx);
 
                     // Und beim rendern wieder von vorne anfangen
+                    NumToRender = 0;
+                }
+
+                if (NumToRender >= TilesToRenderMax) {
+                    DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
                     NumToRender = 0;
                 }
 
@@ -971,28 +989,6 @@ void TileEngineClass::DrawBackLevel() {
                 v4.tv = tu;
 
                 // Hintergrund des Wasser schwabbeln lassen
-
-                // DKS - WaterList lookup table has been replaced with WaterSinTableClass,
-                //      see comments for it in Tileengine.h
-#if 0
-                off = (static_cast<int>(SinPos2) + (yLevel * 2) % 40 + j*2) % 1024;
-
-                //DKS - Fixed out of bounds access to Tiles[][] array on y here:
-                //      When yLevel is 1 and j is -1 (indicating that the one-tile overdraw
-                //      border is being drawn on the top screen edge), this was ending up
-                //      trying to access a row higher than the top screen border which doesn't
-                //      exist. Loading the Eis map (level 7) would crash on some machines.
-                //if (TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)                    // Original line
-                if (yLevel+j > 0 &&    // DKS Added this check to above line
-                        TileAt(xLevel+i, yLevel+j-1).Block & BLOCKWERT_LIQUID)
-                {
-                    if (TileAt(xLevel+i, yLevel+j).move_v1 == true) v1.x += SinList2[off];
-                    if (TileAt(xLevel+i, yLevel+j).move_v2 == true) v2.x += SinList2[off];
-                }
-
-                if (TileAt(xLevel+i, yLevel+j).move_v3 == true) v3.x += SinList2[off + 2];
-                if (TileAt(xLevel+i, yLevel+j).move_v4 == true) v4.x += SinList2[off + 2];
-#endif  // 0
 
                 if (tile.move_v1 || tile.move_v2 ||
                     tile.move_v3 || tile.move_v4) {
@@ -1082,6 +1078,11 @@ void TileEngineClass::DrawFrontLevel() {
                     DirectGraphics.SetTexture(TileGfx[ActualTexture].itsTexIdx);
 
                     // Und beim rendern wieder von vorne anfangen
+                    NumToRender = 0;
+                }
+
+                if (NumToRender >= TilesToRenderMax) {
+                    DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
                     NumToRender = 0;
                 }
 
@@ -1235,9 +1236,6 @@ void TileEngineClass::DrawBackLevelOverlay() {
 
     // Noch keine Tiles zum rendern
     int NumToRender = 0;
-    // int al;
-    // DKS - Variable was unused in original source, disabled:
-    // int off = 0;
 
     for (int j = RenderPosY; j < RenderPosYTo; j++) {
         xScreen = static_cast<float>(-xTileOffs + RenderPosX * TILESIZE_X);
@@ -1266,6 +1264,11 @@ void TileEngineClass::DrawBackLevelOverlay() {
                     NumToRender = 0;
                 }
 
+                if (NumToRender >= TilesToRenderMax) {
+                    DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
+                    NumToRender = 0;
+                }
+
                 unsigned int Type = tile.BackArt - INCLUDE_ZEROTILE;
 
                 // Animiertes Tile ?
@@ -1286,11 +1289,6 @@ void TileEngineClass::DrawBackLevelOverlay() {
                 float const tr = Rect.right / TILESETSIZE_X;   // Rechts
                 float const to = Rect.top / TILESETSIZE_Y;     // Oben
                 float const tu = Rect.bottom / TILESETSIZE_Y;  // Unten
-
-                // al = tile.Alpha;
-
-                // DKS - Variable was unused in original source, disabled:
-                // off = (static_cast<int>(SinPos2) + (yLevel * 2) % 40 + j*2) % 1024;
 
                 v1.color = tile.Color[0];
                 v2.color = tile.Color[1];
@@ -1376,55 +1374,7 @@ void TileEngineClass::DrawOverlayLevel() {
                 float const o = yScreen;               // Oben
                 float const r = xScreen + TILESIZE_X;  // Rechts
                 float const u = yScreen + TILESIZE_Y;  // Unten
-                /*
-                                // Wasserfall
-                                //
-                                if (TileAt(xLevel+i, yLevel+j).Block & BLOCKWERT_WASSERFALL)
-                                {
-                                    // Tiles zeichnen
-                                    if (NumToRender > 0)
-                                    {
-                                        DirectGraphics.RendertoBuffer (GL_TRIANGLES, NumToRender*2,
-                   &TilesToRender[0]); NumToRender   = 0;
-                                    }
-
-                                    ActualTexture = -1;
-
-                                    // Drei Schichten Wasserfall rendern =)
-                                    //
-
-                                    // Schicht 1
-                                    //
-                                    int xoff = (i+xLevel) % 3 * 20;
-                                    int yoff = (j+yLevel) % 3 * 20 + 120 - int (WasserfallOffset);
-
-                                    Wasserfall[0].SetRect (xoff, yoff, xoff+20, yoff+20);
-                                    Wasserfall[0].RenderSprite(static_cast<float>(i*20-xTileOffs),
-                   static_cast<float>(j*20-yTileOffs), Col1);
-
-                                    // Schicht 2
-                                    //
-                                    xoff = (i+xLevel+1) % 3 * 20;
-                                    yoff = (j+yLevel)   % 3 * 20 + 120 - int (WasserfallOffset / 2.0f);
-
-                                    Wasserfall[0].SetRect (xoff, yoff, xoff+20, yoff+20);
-                                    Wasserfall[0].RenderSprite(static_cast<float>(i*20-xTileOffs),
-                   static_cast<float>(j*20-yTileOffs), Col2);
-
-                                    // Glanzschicht (Schicht 3) drüber
-                                    //
-                                    DirectGraphics.SetAdditiveMode();
-                                    Wasserfall[1].SetRect ((i*20-xTileOffs)%640, (j*20-yTileOffs)%480,
-                   (i*20-xTileOffs)%640+20, (j*20-yTileOffs)%480+20);
-                                    Wasserfall[1].RenderSprite(static_cast<float>(i*20-xTileOffs),
-                   static_cast<float>(j*20-yTileOffs), D3DCOLOR_RGBA (180, 240, 255, 60));
-                                    DirectGraphics.SetColorKeyMode();
-                                }
-
-
-                                // normales Overlay Tile
-                                else
-                */
+                
                 if ((tile.FrontArt > 0 &&
                      (tile.Block & BLOCKWERT_VERDECKEN ||
                       tile.Block & BLOCKWERT_MOVEVERTICAL ||
@@ -1444,6 +1394,11 @@ void TileEngineClass::DrawOverlayLevel() {
                         DirectGraphics.SetTexture(TileGfx[ActualTexture].itsTexIdx);
 
                         // Und beim rendern wieder von vorne anfangen
+                        NumToRender = 0;
+                    }
+
+                    if (NumToRender >= TilesToRenderMax) {
+                        DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
                         NumToRender = 0;
                     }
 
@@ -1568,6 +1523,11 @@ void TileEngineClass::DrawWater() {
 
             for (int i = RenderPosX; i < RenderPosXTo; i++) {
                 const LevelTileStruct& tile = TileAt(xLevel + i, yLevel + j);
+
+                if (NumToRender >= TilesToRenderMax) {
+                    DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
+                    NumToRender = 0;
+                }
 
                 // Vordergrund Tiles setzen um Spieler zu verdecken
                 if (tile.Block & BLOCKWERT_LIQUID) {

@@ -65,9 +65,6 @@ constexpr int TILESIZE_Y = 20;         // einzelnen Tiles
 constexpr float TILESETSIZE_X = 256.0f;  // Grösse eines
 constexpr float TILESETSIZE_Y = 256.0f;  // Tilesets
 
-constexpr int SCREENSIZE_X = 32;  // Leveltiles pro Screen
-constexpr int SCREENSIZE_Y = 24;
-
 constexpr int MAX_LEVELSIZE_X = 1024;  // Gesamtgrösse des Level
 constexpr int MAX_LEVELSIZE_Y = 1600;
 
@@ -419,13 +416,15 @@ class WaterSinTableClass {
 // TileEngine Klasse
 // --------------------------------------------------------------------------------------
 
+constexpr int TilesToRenderMax = 1024;
+
 class TileEngineClass {
   private:
     float TileAnimCount;  // Animations-Zähler und
     float CloudMovement;
     int TileAnimPhase;                      // Phase der Tile Animation
     float ScrollSpeedX, ScrollSpeedY;       // Scrollspeed
-    VERTEX2D TilesToRender[40 * 30 * 6];    // Alle zu rendernden Leveltiles
+    VERTEX2D TilesToRender[TilesToRenderMax * 6];    // Alle zu rendernden Leveltiles
     VERTEX2D v1, v2, v3, v4;                // Vertices zum Sprite rendern
     unsigned char LoadedTilesets;           // Anzahl geladener Sets
     LevelTileStruct Tiles[MAX_LEVELSIZE_X]  // Array mit Leveldaten
@@ -436,6 +435,9 @@ class TileEngineClass {
     WaterSinTableClass WaterSinTable;
 
     // Vorberechnung fürs Levelrendern
+
+    int ScreenSizeTiles_X;  // Leveltiles pro Screen
+    int ScreenSizeTiles_Y;
     int RenderPosX;  // Bereich des Levels, der gerendert wird
     int RenderPosY;
     int RenderPosXTo;

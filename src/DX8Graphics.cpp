@@ -95,7 +95,7 @@ bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, st
 
     // Setup SDL Screen
     //if (isFullscreen) {
-        //flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     //}
 
     flags |= SDL_WINDOW_RESIZABLE;
@@ -191,11 +191,20 @@ void DirectGraphicsClass::ResizeToWindow() {
   int height;
   SDL_GetWindowSize(Window, &width, &height);
 
-  WindowView.w = width;
-  WindowView.h = height;
-  RenderRect.w = width;
-  RenderRect.h = height;
+  RenderWidth = width;
+  RenderHeight = height;
 
+  WindowView.w = RenderWidth;
+  WindowView.h = RenderHeight;
+  RenderRect.w = RenderWidth;
+  RenderRect.h = RenderHeight;
+
+  g_matView = glm::mat4x4(1.0f);
+  g_matModelView = glm::mat4x4(1.0f);
+  
+  matProjWindow = glm::ortho(0.0f, static_cast<float>(WindowView.w), static_cast<float>(WindowView.h), 0.0f, 0.0f, 1.0f);
+  
+  matProj = matProjWindow;
 
   glViewport(WindowView.x, WindowView.y, WindowView.w, WindowView.h); /* Setup our viewport. */
 }

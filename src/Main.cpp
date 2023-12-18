@@ -45,26 +45,29 @@ int main() {
     }
 
     if (KeyDown(SDLK_LEFT)) {
-      TileEngine.ScrolltoX -= 5;
+      TileEngine.ScrolltoX -= 20;
     }
     if (KeyDown(SDLK_RIGHT)) {
-      TileEngine.ScrolltoX += 5;
+      TileEngine.ScrolltoX += 20;
     }
     if (KeyDown(SDLK_UP)) {
-      TileEngine.ScrolltoY -= 5;
+      TileEngine.ScrolltoY -= 20;
     }
     if (KeyDown(SDLK_DOWN)) {
-      TileEngine.ScrolltoY += 5;
+      TileEngine.ScrolltoY += 20;
     }
 
     Timer.update();
 
-    TileEngine.SpeedX = 40.0f;
-    TileEngine.SpeedY = 40.0f;
+    TileEngine.SpeedX = 500.0f;
+    TileEngine.SpeedY = 500.0f;
     TileEngine.Zustand = TileStateEnum::SCROLLTO;
     TileEngine.UpdateLevel();
 
+    DirectGraphics.ClearBackBuffer();
+
     DirectGraphics.SetColorKeyMode();
+
     TileEngine.CalcRenderRange();
     TileEngine.DrawBackground();
 
