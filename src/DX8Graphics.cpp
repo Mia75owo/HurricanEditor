@@ -193,8 +193,6 @@ void DirectGraphicsClass::ResizeToWindow() {
 
   WindowView.w = width;
   WindowView.h = height;
-  RenderView.w = width;
-  RenderView.h = height;
   RenderRect.w = width;
   RenderRect.h = height;
 }
@@ -273,7 +271,6 @@ bool DirectGraphicsClass::SetDeviceInfo() {
     g_matModelView = glm::mat4x4(1.0f);
 
     matProjWindow = glm::ortho(0.0f, static_cast<float>(WindowView.w), static_cast<float>(WindowView.h), 0.0f, 0.0f, 1.0f);
-    matProjRender = glm::ortho(0.0f, static_cast<float>(RenderView.w), static_cast<float>(RenderView.h), 0.0f, 0.0f, 1.0f);
 
     matProj = matProjWindow;
 
@@ -463,16 +460,10 @@ void DirectGraphicsClass::SetupFramebuffers() {
     }
     Protokoll << "Window resolution: " << WindowView.w << "x" << WindowView.h << std::endl;
 
-    RenderView.x = 0;
-    RenderView.y = 0;
-    RenderView.w = RenderWidth;
-    RenderView.h = RenderHeight;
-
-    /* No scaling just center the rendering in the window */
     WindowView.x = 0;
     WindowView.y = 0;
-    WindowView.w = RenderView.w;
-    WindowView.h = RenderView.h;
+    WindowView.w = RenderWidth;
+    WindowView.h = RenderHeight;
 
     glViewport(WindowView.x, WindowView.y, WindowView.w, WindowView.h); /* Setup our viewport. */
     Protokoll << "Window viewport: " << WindowView.w << "x" << WindowView.h << " at " << WindowView.x << "x"

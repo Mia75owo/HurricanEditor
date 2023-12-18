@@ -87,7 +87,6 @@ class DirectGraphicsClass {
     SDL_Window *Window;
     SDL_GLContext GLcontext;
     SDL_Rect WindowView;
-    SDL_Rect RenderView;
     SDL_Rect RenderRect;
 
   public:
