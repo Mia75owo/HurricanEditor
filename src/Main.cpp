@@ -49,16 +49,16 @@ int main() {
     }
 
     if (KeyDown(SDLK_LEFT)) {
-      TileEngine.ScrolltoX -= 20;
+      TileEngine.XOffset -= 20;
     }
     if (KeyDown(SDLK_RIGHT)) {
-      TileEngine.ScrolltoX += 20;
+      TileEngine.XOffset += 20;
     }
     if (KeyDown(SDLK_UP)) {
-      TileEngine.ScrolltoY -= 20;
+      TileEngine.YOffset -= 20;
     }
     if (KeyDown(SDLK_DOWN)) {
-      TileEngine.ScrolltoY += 20;
+      TileEngine.YOffset += 20;
     }
 
     Timer.update();

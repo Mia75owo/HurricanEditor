@@ -58,9 +58,6 @@ TileEngineClass::TileEngineClass() {
     XOffset = 0.0f;
     YOffset = 0.0f;
 
-    NewXOffset = -1.0f;
-    NewYOffset = -1.0f;
-
     RenderPosX = 0;
     RenderPosY = 0;
     RenderPosXTo = 0;
@@ -69,14 +66,10 @@ TileEngineClass::TileEngineClass() {
     LEVELSIZE_X = 128;
     LEVELSIZE_Y = 96;
 
-    // Level scrollt von alleine
-    ScrollSpeedX = 0.0f;
-    ScrollSpeedY = 0.0f;
-
     // Speed für "Scrollto" Funktion
     SpeedX = 0.0f;
     SpeedY = 0.0f;
-    CloudMovement = 0.0f;
+    //CloudMovement = 0.0f;
     TileAnimCount = 0.0f;
     TileAnimPhase = 0;
     LoadedTilesets = 0;
@@ -147,9 +140,6 @@ void TileEngineClass::InitNewLevel(int xSize, int ySize) {
     LEVELSIZE_X = xSize;
     LEVELSIZE_Y = ySize;
 
-    ScrollSpeedX = 0.0f;
-    ScrollSpeedY = 0.0f;
-
     memset(&Tiles, 0, sizeof(Tiles));
 
     WaterSinTable.ResetPosition();
@@ -158,9 +148,6 @@ void TileEngineClass::InitNewLevel(int xSize, int ySize) {
 
     XOffset = 0.0f;
     YOffset = 0.0f;
-
-    NewXOffset = -1.0f;
-    NewYOffset = -1.0f;
 }
 
 // --------------------------------------------------------------------------------------
@@ -418,15 +405,6 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     Zustand = TileStateEnum::SCROLLBAR;
 
     return true;
-}
-
-// --------------------------------------------------------------------------------------
-// Neue Scrollspeed setzen
-// --------------------------------------------------------------------------------------
-
-void TileEngineClass::SetScrollSpeed(float xSpeed, float ySpeed) {
-    ScrollSpeedX = xSpeed;
-    ScrollSpeedY = ySpeed;
 }
 
 // --------------------------------------------------------------------------------------
@@ -874,18 +852,6 @@ void TileEngineClass::DrawFrontLevel() {
 
     if (NumToRender > 0)
         DirectGraphics.RendertoBuffer(GL_TRIANGLES, NumToRender * 2, &TilesToRender[0]);
-}
-
-// --------------------------------------------------------------------------------------
-// Level Ausschnitt scrollen
-// --------------------------------------------------------------------------------------
-
-void TileEngineClass::ScrollLevel(float x, float y, TileStateEnum neu, float sx, float sy) {
-    ScrolltoX = x;
-    ScrolltoY = y;
-    SpeedX = sx;
-    SpeedY = sy;
-    Zustand = neu;
 }
 
 // --------------------------------------------------------------------------------------
@@ -1382,9 +1348,6 @@ void TileEngineClass::WertAngleichen(float &nachx, float &nachy, float vonx, flo
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::UpdateLevel() {
-    XOffset += ScrollSpeedX * Timer.getSpeedFactor();
-    YOffset += ScrollSpeedY * Timer.getSpeedFactor();
-
     // Tiles animieren
     TileAnimCount += Timer.getSpeedFactor();        // Counter erhöhen
     if (TileAnimCount > TILEANIM_SPEED)  // auf Maximum prüfen
@@ -1396,6 +1359,7 @@ void TileEngineClass::UpdateLevel() {
             TileAnimPhase = 0;
     }
 
+    #if 0
     // Sichtbaren Level-Ausschnitt scrollen
     if (Zustand == TileStateEnum::SCROLLTO || Zustand == TileStateEnum::SCROLLTOLOCK) {
         if (XOffset < ScrolltoX) {
@@ -1433,6 +1397,7 @@ void TileEngineClass::UpdateLevel() {
                 Zustand = TileStateEnum::SCROLLBAR;
         }
     }
+    #endif
 
     // Wasserfall animieren
     WasserfallOffset += Timer.sync(16.0f);
@@ -1441,21 +1406,13 @@ void TileEngineClass::UpdateLevel() {
         WasserfallOffset -= 120.0f;
 
     WaterSinTable.AdvancePosition(Timer.getSpeedFactor());
-
-    // Level an vorgegebene Position anpassen
-    // weil z.B. der Fahrstuhl selber scrollt?
-    if (NewXOffset != -1.0f)
-        XOffset = NewXOffset;
-
-    if (NewYOffset != -1.0f)
-        YOffset = NewYOffset;
 }
 
 // --------------------------------------------------------------------------------------
 // Zurückliefern, welche BlockArt sich Rechts vom übergebenen Rect befindet
 // --------------------------------------------------------------------------------------
 
-uint32_t TileEngineClass::BlockRechts(float &x, float y, float &xo, float yo, RECT_struct rect, bool resolve) {
+uint32_t TileEngineClass::BlockRechts(float &x, float y, float &xo, float /*yo*/, RECT_struct rect, bool resolve) {
     // Nach rechts muss nicht gecheckt werden ?
     if (xo > x)
         return 0;
@@ -1498,40 +1455,10 @@ uint32_t TileEngineClass::BlockRechts(float &x, float y, float &xo, float yo, RE
 }
 
 // --------------------------------------------------------------------------------------
-// Zurückliefern, ob sich rechts eine zerstörbare Wand befindet
-// --------------------------------------------------------------------------------------
-
-bool TileEngineClass::BlockDestroyRechts(float x, float y, float xo, float yo, RECT_struct rect) {
-    // Nach rechts muss nicht gecheckt werden ?
-    if (xo > x)
-        return false;
-
-    int xlev = static_cast<int>((x + rect.right + 1) * (1.0f / TILESIZE_X));
-    if (xlev < 0 || xlev >= LEVELSIZE_X)
-        return false;
-
-    for (int j = rect.top; j < rect.bottom; j += TILESIZE_Y) {
-        int ylev = static_cast<int>((y + j) * (1.0f / TILESIZE_Y));
-
-        if (ylev < 0)
-            continue;
-        else if (ylev >= LEVELSIZE_Y)
-            break;
-
-        if (TileAt(xlev, ylev).Block & BLOCKWERT_DESTRUCTIBLE) {
-            ExplodeWall(xlev, ylev);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// --------------------------------------------------------------------------------------
 // Zurückliefern, welche BlockArt sich Links vom übergebenen Rect befindet
 // --------------------------------------------------------------------------------------
 
-uint32_t TileEngineClass::BlockLinks(float &x, float y, float &xo, float yo, RECT_struct rect, bool resolve) {
+uint32_t TileEngineClass::BlockLinks(float &x, float y, float &xo, float /*yo*/, RECT_struct rect, bool resolve) {
     // Nach links muss nicht gecheckt werden ?
     if (xo < x)
         return 0;
@@ -1573,40 +1500,10 @@ uint32_t TileEngineClass::BlockLinks(float &x, float y, float &xo, float yo, REC
 }
 
 // --------------------------------------------------------------------------------------
-// Zurückliefern, ob sich links eine zerstörbare Wand befindet
-// --------------------------------------------------------------------------------------
-
-bool TileEngineClass::BlockDestroyLinks(float x, float y, float xo, float yo, RECT_struct rect) {
-    // Nach links muss nicht gecheckt werden ?
-    if (xo < x)
-        return false;
-
-    int xlev = static_cast<int>((x + rect.left - 1) * (1.0f / TILESIZE_X));
-    if (xlev < 0 || xlev >= LEVELSIZE_X)
-        return false;
-
-    for (int j = rect.top; j < rect.bottom; j += TILESIZE_Y) {
-        int ylev = static_cast<int>((y + j) * (1.0f / TILESIZE_Y));
-
-        if (ylev < 0)
-            continue;
-        else if (ylev >= LEVELSIZE_Y)
-            break;
-
-        if (TileAt(xlev, ylev).Block & BLOCKWERT_DESTRUCTIBLE) {
-            ExplodeWall(xlev, ylev);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// --------------------------------------------------------------------------------------
 // Zurückliefern, welche Blockblock sich oberhalb vom übergebenen Rect befindet
 // --------------------------------------------------------------------------------------
 
-uint32_t TileEngineClass::BlockOben(float x, float &y, float xo, float &yo, RECT_struct rect, bool resolve) {
+uint32_t TileEngineClass::BlockOben(float x, float &y, float /*xo*/, float &yo, RECT_struct rect, bool resolve) {
     // Nach oben muss nicht gecheckt werden ?
     if (yo < y)
         return 0;
@@ -1648,41 +1545,11 @@ uint32_t TileEngineClass::BlockOben(float x, float &y, float xo, float &yo, RECT
 }
 
 // --------------------------------------------------------------------------------------
-// Zurückliefern, ob sich oben eine zerstörbare Wand befindet
-// --------------------------------------------------------------------------------------
-
-bool TileEngineClass::BlockDestroyOben(float x, float y, float xo, float yo, RECT_struct rect) {
-    // Nach oben muss nicht gecheckt werden ?
-    if (yo < y)
-        return false;
-
-    int ylev = static_cast<int>((y + rect.top - 1) * (1.0f / TILESIZE_Y));
-    if (ylev < 0 || ylev >= LEVELSIZE_Y)
-        return false;
-
-    for (int i = rect.left; i < rect.right; i += TILESIZE_X) {
-        int xlev = static_cast<int>((x + i) * (1.0f / TILESIZE_X));
-
-        if (xlev < 0)
-            continue;
-        else if (xlev >= LEVELSIZE_X)
-            break;
-
-        if (TileAt(xlev, ylev).Block & BLOCKWERT_DESTRUCTIBLE) {
-            ExplodeWall(xlev, ylev);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// --------------------------------------------------------------------------------------
 // Zurückliefern, welche Blockblock sich unterhalb vom übergebenen Rect befindet
 // und dabei nicht "begradigen" sprich die y-Position an das Tile angleichen
 // --------------------------------------------------------------------------------------
 
-uint32_t TileEngineClass::BlockUntenNormal(float x, float y, float xo, float yo, RECT_struct rect) {
+uint32_t TileEngineClass::BlockUntenNormal(float x, float y, float /*xo*/, float yo, RECT_struct rect) {
     // Nach unten muss nicht gecheckt werden ?
     if (yo > y)
         return false;
@@ -1723,7 +1590,7 @@ uint32_t TileEngineClass::BlockUntenNormal(float x, float y, float xo, float yo,
 // Zurückliefern, welche Blockblock sich unterhalb vom übergebenen Rect befindet
 // --------------------------------------------------------------------------------------
 
-uint32_t TileEngineClass::BlockUnten(float x, float &y, float xo, float &yo, RECT_struct rect, bool resolve) {
+uint32_t TileEngineClass::BlockUnten(float x, float &y, float /*xo*/, float &yo, RECT_struct rect, bool resolve) {
     // Nach unten muss nicht gecheckt werden ?
     if (yo > y)
         return 0;
@@ -1766,36 +1633,6 @@ uint32_t TileEngineClass::BlockUnten(float x, float &y, float xo, float &yo, REC
     }
 
     return block;
-}
-
-// --------------------------------------------------------------------------------------
-// Zurückliefern, welche Blockblock sich unterhalb vom übergebenen Rect befindet
-// --------------------------------------------------------------------------------------
-
-bool TileEngineClass::BlockDestroyUnten(float x, float y, float xo, float yo, RECT_struct rect) {
-    // Nach unten muss nicht gecheckt werden ?
-    if (yo > y)
-        return 0;
-
-    int ylev = static_cast<int>((y + rect.bottom + 1) * (1.0f / TILESIZE_Y));
-    if (ylev < 0 || ylev >= LEVELSIZE_Y)
-        return false;
-
-    for (int i = rect.left; i < rect.right; i += TILESIZE_X) {
-        int xlev = static_cast<int>((x + i) * (1.0f / TILESIZE_X));
-
-        if (xlev < 0)
-            continue;
-        else if (xlev >= LEVELSIZE_X)
-            break;
-
-        if (TileAt(xlev, ylev).Block & BLOCKWERT_DESTRUCTIBLE) {
-            ExplodeWall(xlev, ylev);
-            return true;
-        }
-    }
-
-    return false;
 }
 
 // --------------------------------------------------------------------------------------
@@ -1865,49 +1702,14 @@ uint32_t TileEngineClass::BlockSlopes(const float x, float &y, const RECT_struct
 }
 
 // --------------------------------------------------------------------------------------
-// Checken ob ein Schuss eine zerstörbare Wand getroffen hat und wenn ja, diese
-// zerstören und true zurückliefern, damit der Schuss ebenfalls gelöscht wird
-// --------------------------------------------------------------------------------------
-bool TileEngineClass::CheckDestroyableWalls(float x, float y, float xs, float ys, RECT_struct rect) {
-    // Ausserhalb vom Level?
-    //
-    if (x < 0 || x > LEVELPIXELSIZE_X ||
-            y < 0 || y > LEVELPIXELSIZE_Y)
-        return false;
-
-    int xstart = static_cast<int>((x + Timer.sync(xs)) * (1.0f / TILESIZE_X));
-    int ystart = static_cast<int>((y + Timer.sync(ys)) * (1.0f / TILESIZE_Y));
-
-    int const xl = rect.right / TILESIZE_X + 2;
-    int const yl = rect.bottom / TILESIZE_Y + 2;
-
-    // avoid out-of-bounds access to Tiles[][] array.
-    xstart = std::clamp(xstart, 1, LEVELSIZE_X - xl);
-    ystart = std::clamp(ystart, 0, LEVELSIZE_Y - yl);
-
-    // Check whole rect of the shot
-    for (int i=xstart-1; i<xstart + xl; i++) {
-        for (int j=ystart; j<ystart + yl; j++) {
-            if (TileAt(i, j).Block & BLOCKWERT_DESTRUCTIBLE)
-            {
-                ExplodeWall(i, j);
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-// --------------------------------------------------------------------------------------
 // Zurückliefern, welcher Farbwert sich in der Mitte des RECTs an x/y im Level befindet
 // damit die Gegner entsprechend dem Licht im Editor "beleuchtet" werden
 // --------------------------------------------------------------------------------------
 
 D3DCOLOR TileEngineClass::LightValue(float x, float y, RECT_struct rect, bool forced) {
 
-    int const x_level = static_cast<int>((x + (rect.right - rect.left) / 2) / TILESIZE_X);  // xPosition im Level
-    int const y_level = static_cast<int>((y + (rect.bottom - rect.top) / 2) / TILESIZE_Y);  // yPosition im Level
+    int const x_level = static_cast<int>((x + static_cast<float>(rect.right - rect.left) / 2) / TILESIZE_X);  // xPosition im Level
+    int const y_level = static_cast<int>((y + static_cast<float>(rect.bottom - rect.top) / 2) / TILESIZE_Y);  // yPosition im Level
 
     if ((x_level >= LEVELSIZE_X || y_level >= LEVELSIZE_Y) ||
         (!forced && !(TileAt(x_level, y_level).Block & BLOCKWERT_LIGHT)))  // Soll das Leveltile garnicht
@@ -2028,7 +1830,8 @@ void TileEngineClass::DrawShadow() {
     if (!bDrawShadow)
         return;
 
-    float x, y;
+    float x = XOffset + 320.0f;
+    float y = YOffset + 240.0f;
 
     D3DCOLOR col = D3DCOLOR_RGBA(255, 255, 255, static_cast<int>(ShadowAlpha));
 
@@ -2045,65 +1848,6 @@ void TileEngineClass::DrawShadow() {
     RenderRect(x - 200, y + 1420, 1420, 200, col);
     RenderRect(x - 200, y, 200, 1024, col);
     RenderRect(x + 1024, y, 200, 1024, col);
-}
-
-// --------------------------------------------------------------------------------------
-// Wand an x/y explodieren lassen
-// --------------------------------------------------------------------------------------
-
-void TileEngineClass::ExplodeWall(int x, int y) {
-    // ausserhalb des Levels nicht testen ;)
-    if (x < 1 || y < 1 || x > (LEVELSIZE_X - 1) || y > (LEVELSIZE_Y - 1))
-        return;
-
-    LevelTileStruct& tile = TileAt(x, y);
-
-    // keine zerstörbare Wand?
-    //
-    if (!(tile.Block & BLOCKWERT_DESTRUCTIBLE))
-        return;
-
-    tile.Block = 0;
-    tile.FrontArt = 0;
-}
-
-// --------------------------------------------------------------------------------------
-// Wand an x/y und angrenzende Wände explodieren lassen
-// --------------------------------------------------------------------------------------
-
-void TileEngineClass::ExplodeWalls(int x, int y) {
-    // Rundes Loch erzeugen
-    //  xxx
-    // xxxxx
-    // xxxxx
-    // xxxxx
-    //  xxx
-
-    ExplodeWall(x - 1, y - 2);
-    ExplodeWall(x + 0, y - 2);
-    ExplodeWall(x + 1, y - 2);
-
-    ExplodeWall(x - 2, y - 1);
-    ExplodeWall(x - 1, y - 1);
-    ExplodeWall(x + 0, y - 1);
-    ExplodeWall(x + 1, y - 1);
-    ExplodeWall(x + 2, y - 1);
-
-    ExplodeWall(x - 2, y + 0);
-    ExplodeWall(x - 1, y + 0);
-    ExplodeWall(x + 0, y + 0);
-    ExplodeWall(x + 1, y + 0);
-    ExplodeWall(x + 2, y + 0);
-
-    ExplodeWall(x - 2, y + 1);
-    ExplodeWall(x - 1, y + 1);
-    ExplodeWall(x + 0, y + 1);
-    ExplodeWall(x + 1, y + 1);
-    ExplodeWall(x + 2, y + 1);
-
-    ExplodeWall(x - 1, y + 2);
-    ExplodeWall(x + 0, y + 2);
-    ExplodeWall(x + 1, y + 2);
 }
 
 void TileEngineClass::ToggleLamp() {
