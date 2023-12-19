@@ -358,6 +358,49 @@ void DirectGraphicsSprite::RenderMirroredSprite(float x, float y, D3DCOLOR Color
     DirectGraphics.RendertoBuffer(GL_TRIANGLE_STRIP, 2, &TriangleStrip[0]);
 }
 
+void DirectGraphicsSprite::RenderSpriteWithScale(float x, float y, float scale, D3DCOLOR col) {
+    // Vertice Koordinaten
+    float l = x;                                   // Links
+    float r = x + (itsRect.right - itsRect.left) * scale;  // Rechts
+    float o = y;                                   // Oben
+    float u = y + (itsRect.bottom - itsRect.top) * scale;  // Unten
+
+    // Textur Koordinaten
+    float tl = itsRect.left * itsXTexScale;    // Links
+    float tr = itsRect.right * itsXTexScale;   // Rechts
+    float to = itsRect.top * itsYTexScale;     // Oben
+    float tu = itsRect.bottom * itsYTexScale;  // Unten
+
+    VERTEX2D TriangleStrip[4];  // DKS - Added local declaration
+
+    TriangleStrip[0].color = TriangleStrip[1].color = TriangleStrip[2].color = TriangleStrip[3].color = col;
+
+    TriangleStrip[0].x = l;  // Links oben
+    TriangleStrip[0].y = o;
+    TriangleStrip[0].tu = tl;
+    TriangleStrip[0].tv = to;
+
+    TriangleStrip[1].x = r;  // Rechts oben
+    TriangleStrip[1].y = o;
+    TriangleStrip[1].tu = tr;
+    TriangleStrip[1].tv = to;
+
+    TriangleStrip[2].x = l;  // Links unten
+    TriangleStrip[2].y = u;
+    TriangleStrip[2].tu = tl;
+    TriangleStrip[2].tv = tu;
+
+    TriangleStrip[3].x = r;  // Rechts unten
+    TriangleStrip[3].y = u;
+    TriangleStrip[3].tu = tr;
+    TriangleStrip[3].tv = tu;
+
+    DirectGraphics.SetTexture(itsTexIdx);
+
+    // Sprite zeichnen
+    DirectGraphics.RendertoBuffer(GL_TRIANGLE_STRIP, 2, &TriangleStrip[0]);
+}
+
 // --------------------------------------------------------------------------------------
 // Sprite skaliert zeichnen mit aktuellem Surfaceausschnitt (mit textur Filter)
 // --------------------------------------------------------------------------------------

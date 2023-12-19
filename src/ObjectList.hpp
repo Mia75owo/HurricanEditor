@@ -22,8 +22,8 @@ public:
   void LoadObjectGraphic(int index);
   void LoadAllGraphics();
 
-  void DrawObject(int index, TileEngineClass& TE);
-  void DrawAllObjects(TileEngineClass& TE);
+  void DrawObject(int index, float xoff, float yoff, float scale);
+  void DrawAllObjects(float xoff, float yoff, float scale);
 
   unsigned int ObjectIndex;
 

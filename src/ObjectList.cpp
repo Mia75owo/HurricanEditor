@@ -230,7 +230,7 @@ void ObjectListClass::PushObject(uint32_t ID, int32_t x, int32_t y, int32_t Valu
     ObjectIndex++;
 }
 
-void ObjectListClass::DrawObject(int index, TileEngineClass& TE) {
+void ObjectListClass::DrawObject(int index, float xoff, float yoff, float scale) {
     if (Objects[index].ObjectID == 0)
         return;
 
@@ -242,15 +242,15 @@ void ObjectListClass::DrawObject(int index, TileEngineClass& TE) {
     #endif
 
     auto& obj = Objects[index];
-    float x = obj.XPos - TE.XOffset;
-    float y = obj.YPos - TE.YOffset;
+    float x = obj.XPos * scale - xoff;
+    float y = obj.YPos * scale - yoff;
 
-    ObjectGraphics[obj.ObjectID]->RenderSprite(x, y, 0xFFFFFFFF);
+    ObjectGraphics[obj.ObjectID]->RenderSpriteWithScale(x, y, scale, 0xFFFFFFFF);
 }
 
-void ObjectListClass::DrawAllObjects(TileEngineClass& TE) {
+void ObjectListClass::DrawAllObjects(float xoff, float yoff, float scale) {
     for (unsigned int i = 0; i < ObjectIndex; i++) {
-        DrawObject(i, TE);
+        DrawObject(i, xoff, yoff, scale);
     }
 }
 
@@ -276,7 +276,7 @@ void ObjectListClass::LoadAllGraphics() {
 
 ObjectListClass::ObjectListClass() {
     for (auto& object : Objects) {
-        object = { 0, 0, 0 };
+        object = { 0, 0, 0, 0, 0 };
     }
 }
 ObjectListClass::~ObjectListClass() {

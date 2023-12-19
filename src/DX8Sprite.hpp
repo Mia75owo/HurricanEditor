@@ -171,6 +171,11 @@ class DirectGraphicsSprite {
             RenderMirroredSprite(x, y, Color);
     }
 
+    void RenderSpriteWithScale(float x,
+                                float y,
+                                float scale,
+                                D3DCOLOR col);
+
     void RenderSpriteScaled(float x,
                             float y,  // Sprite in beliebiger Grösse
                             int width,

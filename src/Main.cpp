@@ -3,7 +3,6 @@
 #include "DX8Graphics.hpp"
 #include "DX8Texture.hpp"
 #include "Logdatei.hpp"
-#include "SDL_mouse.h"
 #include "Tileengine.hpp"
 #include "Timer.hpp"
 #include "ObjectList.hpp"
@@ -26,7 +25,7 @@ int main() {
   DirectGraphics.Init(640, 480, 32, false);
   KeyBuffer = SDL_GetKeyboardState(&NumberOfKeys);
 
-  TileEngine.LoadLevel("/home/mia/code/Editor/data/levels/jungle.map");
+  TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
 
   Timer.SetMaxFPS(60);
   Timer.update();
@@ -36,6 +35,8 @@ int main() {
   int MouseX;
   int MouseY;
   unsigned int MouseMask;
+
+  TileEngine.Scale = 1.0;
 
   while (GameRunning) {
     SDL_Event ev;
@@ -49,6 +50,14 @@ int main() {
             DirectGraphics.ResizeToWindow();
           }
           break;
+        case SDL_MOUSEWHEEL:
+          if (ev.wheel.y > 0) {
+            // Scroll up
+            TileEngine.Scale += 0.1;
+          } else if (ev.wheel.y < 0) {
+            // Scroll down
+            TileEngine.Scale -= 0.1;
+          }
         default:
           break;
       }
@@ -93,7 +102,7 @@ int main() {
     TileEngine.DrawBackLevel();
     TileEngine.DrawFrontLevel();
 
-    ObjectList.DrawAllObjects(TileEngine);
+    ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset, TileEngine.Scale);
 
     DirectGraphics.SetColorKeyMode();
 

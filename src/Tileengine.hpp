@@ -60,8 +60,8 @@ constexpr float TILEANIM_SPEED = 0.8f;
 
 //--- Werte zur Levelgrösse
 
-constexpr int TILESIZE_X = 20;         // Grösse eines
-constexpr int TILESIZE_Y = 20;         // einzelnen Tiles
+constexpr int ORIGINAL_TILE_SIZE_X = 20;         // Grösse eines
+constexpr int ORIGINAL_TILE_SIZE_Y = 20;         // einzelnen Tiles
 constexpr float TILESETSIZE_X = 256.0f;  // Grösse eines
 constexpr float TILESETSIZE_Y = 256.0f;  // Tilesets
 
@@ -354,8 +354,8 @@ class TileEngineClass {
     int RenderPosYTo;
     int xLevel;
     int yLevel;
-    int xTileOffs;
-    int yTileOffs;
+    float xTileOffs;
+    float yTileOffs;
     float xScreen;
     float yScreen;
 
@@ -373,6 +373,10 @@ class TileEngineClass {
     FileAppendix DateiAppendix;  // Anhang der Level-Datei
 
   public:
+    float Scale = 1.0f;
+    float TileSizeX;
+    float TileSizeY;
+
     bool IsElevatorLevel;
     bool MustCenterPlayer;
     int ColR1, ColG1, ColB1;  // Farben in RGB
