@@ -1131,7 +1131,6 @@ void TileEngineClass::DrawOverlayLevel() {
 // --------------------------------------------------------------------------------------
 
 void TileEngineClass::DrawWater() {
-
     // x und ypos am screen errechnen
     xScreen = static_cast<float>(-xTileOffs + RenderPosX * TileSizeX);
     yScreen = static_cast<float>(-yTileOffs + RenderPosY * TileSizeY);
@@ -1145,8 +1144,8 @@ void TileEngineClass::DrawWater() {
     // zwei Schichten Wasser rendern
     for (int schicht = 0; schicht < 2; schicht++) {
         // Offsets der Tiles berechnen (0-19)
-        xTileOffs = static_cast<int>(XOffset) % (int)TileSizeX;
-        yTileOffs = static_cast<int>(YOffset) % (int)TileSizeY;
+        xTileOffs = fmod(XOffset, TileSizeX);
+        yTileOffs = fmod(YOffset, TileSizeY);
 
         // ypos am screen errechnen
         yScreen = static_cast<float>(-yTileOffs + RenderPosY * TileSizeY);
