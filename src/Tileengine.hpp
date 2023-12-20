@@ -409,6 +409,9 @@ class TileEngineClass {
     TileEngineClass();   // Konstruktor
     ~TileEngineClass();  // Destruktor
 
+    void ZoomIn(float val);
+    void ZoomOut(float val);
+
     void LoadSprites();
 
     void ClearLevel();                            // Level freigeben

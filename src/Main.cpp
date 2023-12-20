@@ -53,10 +53,10 @@ int main() {
         case SDL_MOUSEWHEEL:
           if (ev.wheel.y > 0) {
             // Scroll up
-            TileEngine.Scale += 0.1;
+            TileEngine.ZoomIn(0.1);
           } else if (ev.wheel.y < 0) {
             // Scroll down
-            TileEngine.Scale -= 0.1;
+            TileEngine.ZoomOut(0.1);
           }
         default:
           break;

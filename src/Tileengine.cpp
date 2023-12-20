@@ -133,6 +133,28 @@ void TileEngineClass::LoadSprites() {
     Shadow.LoadImage("shadow.png", 512, 512, 512, 512, 1, 1);
 }
 
+void TileEngineClass::ZoomIn(float val) {
+    //float diffx = 0;
+    //float diffy = 0;
+    //XOffset += diffx;
+    //YOffset += diffy;
+    //XOffset *= 1 + val;
+    //YOffset *= 1 + val;
+
+    //float diffx = ((Scale + val) * ScreenSizeTiles_X) - (Scale * ScreenSizeTiles_X);
+    //float diffy = ((Scale + val) * ScreenSizeTiles_Y) - (Scale * ScreenSizeTiles_Y);
+    //XOffset *= 1 + ((Scale + val) - Scale);
+    //YOffset *= 1 + ((Scale + val) - Scale);
+    Scale += val;
+}
+void TileEngineClass::ZoomOut(float val) {
+    //float diffx = (Scale * ScreenSizeTiles_X) - ((Scale + val) * ScreenSizeTiles_X);
+    //float diffy = (Scale * ScreenSizeTiles_Y) - ((Scale + val) * ScreenSizeTiles_Y);
+    Scale -= val;
+    //XOffset += diffx;
+    //YOffset += diffy;
+}
+
 // --------------------------------------------------------------------------------------
 // Neues, leeres Level der Grösse xSize/ySize erstellen
 // --------------------------------------------------------------------------------------
@@ -190,8 +212,8 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     // und Werte übertragen
     LEVELSIZE_X = FixEndian(DateiHeader.SizeX);
     LEVELSIZE_Y = FixEndian(DateiHeader.SizeY);
-    LEVELPIXELSIZE_X = LEVELSIZE_X * TileSizeX;
-    LEVELPIXELSIZE_Y = LEVELSIZE_Y * TileSizeY;
+    LEVELPIXELSIZE_X = LEVELSIZE_X * ORIGINAL_TILE_SIZE_X;
+    LEVELPIXELSIZE_Y = LEVELSIZE_Y * ORIGINAL_TILE_SIZE_Y;
     LoadedTilesets = DateiHeader.UsedTilesets;
     strcpy_s(Beschreibung, DateiHeader.Beschreibung);
     bScrollBackground = DateiHeader.ScrollBackground;
@@ -418,6 +440,11 @@ void TileEngineClass::CalcRenderRange() {
 
     ScreenSizeTiles_X = DirectGraphics.RenderWidth / TileSizeX;
     ScreenSizeTiles_Y = DirectGraphics.RenderHeight / TileSizeY;
+
+    if (XOffset < 0)
+        XOffset = 0;
+    if (YOffset < 0)
+        YOffset = 0;
 
     // Ausschnittgröße berechnen
     //
