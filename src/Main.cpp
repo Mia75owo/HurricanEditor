@@ -25,7 +25,7 @@ int main() {
   DirectGraphics.Init(640, 480, 32, false);
   KeyBuffer = SDL_GetKeyboardState(&NumberOfKeys);
 
-  TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
+  TileEngine.LoadLevel(g_storage_ext + "/data/levels/temple.map");
 
   Timer.SetMaxFPS(60);
   Timer.update();
@@ -53,10 +53,10 @@ int main() {
         case SDL_MOUSEWHEEL:
           if (ev.wheel.y > 0) {
             // Scroll up
-            TileEngine.ZoomIn(0.1);
+            TileEngine.Zoom(1.1);
           } else if (ev.wheel.y < 0) {
             // Scroll down
-            TileEngine.ZoomOut(0.1);
+            TileEngine.Zoom(0.9);
           }
         default:
           break;
@@ -87,9 +87,6 @@ int main() {
 
     Timer.update();
 
-    TileEngine.SpeedX = 500.0f;
-    TileEngine.SpeedY = 500.0f;
-    TileEngine.Zustand = TileStateEnum::SCROLLTO;
     TileEngine.UpdateLevel();
 
     DirectGraphics.ClearBackBuffer();
@@ -109,7 +106,7 @@ int main() {
     TileEngine.DrawWater();
     TileEngine.DrawBackLevelOverlay();
     TileEngine.DrawOverlayLevel();
-    TileEngine.DrawShadow();
+    //TileEngine.DrawShadow();
 
     DirectGraphics.DisplayBuffer();
 

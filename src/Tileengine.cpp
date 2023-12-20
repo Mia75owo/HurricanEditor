@@ -67,9 +67,6 @@ TileEngineClass::TileEngineClass() {
     LEVELSIZE_X = 128;
     LEVELSIZE_Y = 96;
 
-    // Speed für "Scrollto" Funktion
-    SpeedX = 0.0f;
-    SpeedY = 0.0f;
     //CloudMovement = 0.0f;
     TileAnimCount = 0.0f;
     TileAnimPhase = 0;
@@ -99,8 +96,6 @@ TileEngineClass::TileEngineClass() {
     }
 
     WasserfallOffset = 0.0f;
-
-    Zustand = TileStateEnum::SCROLLBAR;
 
     // Tile Ausschnitte vorberechnen
     //
@@ -133,26 +128,31 @@ void TileEngineClass::LoadSprites() {
     Shadow.LoadImage("shadow.png", 512, 512, 512, 512, 1, 1);
 }
 
-void TileEngineClass::ZoomIn(float val) {
-    //float diffx = 0;
-    //float diffy = 0;
-    //XOffset += diffx;
-    //YOffset += diffy;
-    //XOffset *= 1 + val;
-    //YOffset *= 1 + val;
+void TileEngineClass::Zoom(float times) {
+    float OriginalScale = Scale;
 
-    //float diffx = ((Scale + val) * ScreenSizeTiles_X) - (Scale * ScreenSizeTiles_X);
-    //float diffy = ((Scale + val) * ScreenSizeTiles_Y) - (Scale * ScreenSizeTiles_Y);
-    //XOffset *= 1 + ((Scale + val) - Scale);
-    //YOffset *= 1 + ((Scale + val) - Scale);
-    Scale += val;
-}
-void TileEngineClass::ZoomOut(float val) {
-    //float diffx = (Scale * ScreenSizeTiles_X) - ((Scale + val) * ScreenSizeTiles_X);
-    //float diffy = (Scale * ScreenSizeTiles_Y) - ((Scale + val) * ScreenSizeTiles_Y);
-    Scale -= val;
-    //XOffset += diffx;
-    //YOffset += diffy;
+    Scale *= times;
+
+    CalcRenderRange();
+
+    // Cap the zoom
+    if (times < 1.0f && LEVELPIXELSIZE_X <= DirectGraphics.RenderWidth
+      ||times < 1.0f && LEVELPIXELSIZE_Y <= DirectGraphics.RenderHeight) {
+        Scale = OriginalScale;
+        CalcRenderRange();
+        return;
+    }
+
+    Scale = OriginalScale;
+
+    // Center screen again
+    const float aspect = (Scale * times) / Scale;
+    const float screenaspectx = (DirectGraphics.RenderWidth * aspect) - DirectGraphics.RenderWidth;
+    const float screenaspecty = (DirectGraphics.RenderHeight * aspect) - DirectGraphics.RenderHeight;
+    XOffset = XOffset * aspect + screenaspectx / 2.0f;
+    YOffset = YOffset * aspect + screenaspecty / 2.0f;
+
+    Scale *= times;
 }
 
 // --------------------------------------------------------------------------------------
@@ -212,8 +212,6 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     // und Werte übertragen
     LEVELSIZE_X = FixEndian(DateiHeader.SizeX);
     LEVELSIZE_Y = FixEndian(DateiHeader.SizeY);
-    LEVELPIXELSIZE_X = LEVELSIZE_X * ORIGINAL_TILE_SIZE_X;
-    LEVELPIXELSIZE_Y = LEVELSIZE_Y * ORIGINAL_TILE_SIZE_Y;
     LoadedTilesets = DateiHeader.UsedTilesets;
     strcpy_s(Beschreibung, DateiHeader.Beschreibung);
     bScrollBackground = DateiHeader.ScrollBackground;
@@ -347,8 +345,6 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
             if (LoadObject.ObjectID == 0) {
                 XOffset = static_cast<float>(LoadObject.XPos) - static_cast<float>(DirectGraphics.RenderWidth) / 2;
                 YOffset = static_cast<float>(LoadObject.YPos) - static_cast<float>(DirectGraphics.RenderHeight) / 2;
-                ScrolltoX = XOffset;
-                ScrolltoY = YOffset;
             } else {
                 // Gegner und andere Objekte laden und ins Level setzen
                 switch (LoadObject.ObjectID) {
@@ -425,8 +421,6 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     // Level korrekt geladen
     Protokoll << "-> Load Level : " << Filename << " successful ! <-\n" << std::endl;
 
-    Zustand = TileStateEnum::SCROLLBAR;
-
     return true;
 }
 
@@ -441,10 +435,17 @@ void TileEngineClass::CalcRenderRange() {
     ScreenSizeTiles_X = DirectGraphics.RenderWidth / TileSizeX;
     ScreenSizeTiles_Y = DirectGraphics.RenderHeight / TileSizeY;
 
+    LEVELPIXELSIZE_X = LEVELSIZE_X * TileSizeX;
+    LEVELPIXELSIZE_Y = LEVELSIZE_Y * TileSizeY;
+
     if (XOffset < 0)
         XOffset = 0;
     if (YOffset < 0)
         YOffset = 0;
+    if (XOffset + DirectGraphics.RenderWidth >= LEVELPIXELSIZE_X - TileSizeX)
+        XOffset = LEVELPIXELSIZE_X - DirectGraphics.RenderWidth - TileSizeX;
+    if (YOffset + DirectGraphics.RenderHeight >= LEVELPIXELSIZE_Y - TileSizeY)
+        YOffset = LEVELPIXELSIZE_Y - DirectGraphics.RenderHeight - TileSizeY;
 
     // Ausschnittgröße berechnen
     //
@@ -1388,46 +1389,6 @@ void TileEngineClass::UpdateLevel() {
         if (TileAnimPhase >= 4)  // Animation wieer von vorne ?
             TileAnimPhase = 0;
     }
-
-    #if 0
-    // Sichtbaren Level-Ausschnitt scrollen
-    if (Zustand == TileStateEnum::SCROLLTO || Zustand == TileStateEnum::SCROLLTOLOCK) {
-        if (XOffset < ScrolltoX) {
-            XOffset += Timer.sync(SpeedX);
-
-            if (XOffset > ScrolltoX)
-                XOffset = ScrolltoX;
-        }
-
-        if (XOffset > ScrolltoX) {
-            XOffset -= Timer.sync(SpeedX);
-
-            if (XOffset < ScrolltoX)
-                XOffset = ScrolltoX;
-        }
-
-        if (YOffset < ScrolltoY) {
-            YOffset += Timer.sync(SpeedY);
-
-            if (YOffset > ScrolltoY)
-                YOffset = ScrolltoY;
-        }
-
-        if (YOffset > ScrolltoY) {
-            YOffset -= Timer.sync(SpeedY);
-
-            if (YOffset < ScrolltoY)
-                YOffset = ScrolltoY;
-        }
-
-        if (XOffset == ScrolltoX && YOffset == ScrolltoY) {
-            if (Zustand == TileStateEnum::SCROLLTOLOCK)
-                Zustand = TileStateEnum::LOCKED;
-            else
-                Zustand = TileStateEnum::SCROLLBAR;
-        }
-    }
-    #endif
 
     // Wasserfall animieren
     WasserfallOffset += Timer.sync(16.0f);

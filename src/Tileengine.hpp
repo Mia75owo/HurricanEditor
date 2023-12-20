@@ -87,16 +87,6 @@ constexpr int SCROLL_BORDER_BOTTOM = 50;
 constexpr int LOOK_BORDER_TOP = 60;
 constexpr int LOOK_BORDER_BOTTOM = 400;
 
-//--- Zustände der Tileengine
-
-enum class TileStateEnum {
-  SCROLLBAR,       // Spieler kann Level scrollen durch laufen
-  SCROLLTO,        // Level Scrollt zu bestimmter Position
-  SCROLLTOLOCK,    // Level Scrollt zu bestimmter Position und lockt dann
-  SCROLLTOPLAYER,  // Level Scrollt zum Spieler
-  LOCKED           // Level sitzt an bestimmter Position fest
-};
-
 // --------------------------------------------------------------------------------------
 // Strukturen
 // --------------------------------------------------------------------------------------
@@ -384,9 +374,6 @@ class TileEngineClass {
     int ColR3, ColG3, ColB3;
 
     char Beschreibung[100];      // Beschreibung des Levels
-    TileStateEnum Zustand;       // Aktueller Zustand
-    float ScrolltoX, ScrolltoY;  // Lock-Werte
-    float SpeedX, SpeedY;        // Speed for ScrollTo Funktion
     int MaxBlocks;
     int MaxOneUps;
     int MaxSecrets;
@@ -409,8 +396,7 @@ class TileEngineClass {
     TileEngineClass();   // Konstruktor
     ~TileEngineClass();  // Destruktor
 
-    void ZoomIn(float val);
-    void ZoomOut(float val);
+    void Zoom(float times);
 
     void LoadSprites();
 
