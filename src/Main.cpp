@@ -21,11 +21,14 @@ const Uint8 *KeyBuffer;
 int NumberOfKeys;
 #define KeyDown(key) (KeyBuffer[SDL_GetScancodeFromKey(key)] > 0)
 
+void LoadMap(int index);
+
 int main() {
   DirectGraphics.Init(640, 480, 32, false);
   KeyBuffer = SDL_GetKeyboardState(&NumberOfKeys);
 
   TileEngine.LoadLevel(g_storage_ext + "/data/levels/temple.map");
+  TileEngine.LoadLevel(g_storage_ext + "/data/levels/cave.map");
 
   Timer.SetMaxFPS(60);
   Timer.update();
@@ -35,8 +38,6 @@ int main() {
   int MouseX;
   int MouseY;
   unsigned int MouseMask;
-
-  TileEngine.Scale = 1.0;
 
   while (GameRunning) {
     SDL_Event ev;
@@ -58,10 +59,24 @@ int main() {
             // Scroll down
             TileEngine.Zoom(0.9);
           }
+        case SDL_KEYDOWN:
+        switch (ev.key.keysym.sym) {
+            case SDLK_1: LoadMap(1); break;
+            case SDLK_2: LoadMap(2); break;
+            case SDLK_3: LoadMap(3); break;
+            case SDLK_4: LoadMap(4); break;
+            case SDLK_5: LoadMap(5); break;
+            case SDLK_6: LoadMap(6); break;
+            case SDLK_7: LoadMap(7); break;
+            case SDLK_8: LoadMap(8); break;
+            case SDLK_9: LoadMap(9); break;
+            case SDLK_0: LoadMap(10); break;
+          }
         default:
           break;
       }
     }
+
 
     OldMouseX = MouseX;
     OldMouseY = MouseY;
@@ -111,5 +126,24 @@ int main() {
     DirectGraphics.DisplayBuffer();
 
     Timer.wait();
+  }
+}
+
+void LoadMap(int index) {
+  const std::map<int, std::string> level_map = {
+    std::pair(1, g_storage_ext + "/data/levels/jungle.map"),
+    std::pair(2, g_storage_ext + "/data/levels/temple.map"),
+    std::pair(3, g_storage_ext + "/data/levels/elevator.map"),
+    std::pair(4, g_storage_ext + "/data/levels/mpde.map"),
+    std::pair(5, g_storage_ext + "/data/levels/spinnenfabrik.map"),
+    std::pair(6, g_storage_ext + "/data/levels/tower.map"),
+    std::pair(7, g_storage_ext + "/data/levels/eis.map"),
+    std::pair(8, g_storage_ext + "/data/levels/cave.map"),
+    std::pair(9, g_storage_ext + "/data/levels/endboss.map"),
+    std::pair(10, g_storage_ext + "/data/levels/tutorial.map"),
+  };
+
+  if (level_map.find(index) != level_map.end()) {
+    TileEngine.LoadLevel(level_map.at(index));
   }
 }
