@@ -160,7 +160,10 @@ enum Enemy {
 
   // Objekte, die nicht im Editor auftauchen
   KETTENGLIED = 190,     // Kettenglied z.B. vom Rollmops
-  SKULL = 191            // Schädel vom Skeletor
+  SKULL = 191,           // Schädel vom Skeletor
+
+
+  NULLENEMY = 255        // No Enemy
 };
 
 constexpr int MAX_GEGNER = 2048;    // Maximale Zahl Gegner pro Level

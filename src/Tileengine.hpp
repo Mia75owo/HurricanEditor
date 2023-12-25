@@ -127,7 +127,7 @@ struct LevelObjectStruct {
     uint32_t ObjectID;           // Welche Objekt ID ?
     int32_t XPos;                // x-Position
     int32_t YPos;                // y-Position
-    uint8_t ChangeLight;         // Umgebungslicht annehmen ?
+    bool ChangeLight;         // Umgebungslicht annehmen ?
     uint8_t Skill;               // 0 = Easy, 1 = Medium, 2 = Hard, 3 = Hurrican
     uint8_t PADDING_CHUNK_1[2];  // 2 PADDING BYTES
     int32_t Value1;              // Werte für diverse Trigger
@@ -323,6 +323,8 @@ constexpr int TilesToRenderMax = 1024;
 
 class TileEngineClass {
   private:
+    FileHeader DateiHeader;  // Header der Level-Datei
+
     float TileAnimCount;  // Animations-Zähler und
     //float CloudMovement;
     int TileAnimPhase;                      // Phase der Tile Animation
@@ -336,8 +338,8 @@ class TileEngineClass {
 
     // Vorberechnung fürs Levelrendern
 
-    int ScreenSizeTiles_X;  // Leveltiles pro Screen
-    int ScreenSizeTiles_Y;
+    int ScreenSizeTilesX;  // Leveltiles pro Screen
+    int ScreenSizeTilesY;
     int RenderPosX;  // Bereich des Levels, der gerendert wird
     int RenderPosY;
     int RenderPosXTo;
@@ -369,8 +371,8 @@ class TileEngineClass {
 
     bool IsElevatorLevel;
     bool MustCenterPlayer;
-    int ColR1, ColG1, ColB1;  // Farben in RGB
-    int ColR2, ColG2, ColB2;
+    int ColR1, ColG1, ColB1, ColA1;  // Farben in RGB
+    int ColR2, ColG2, ColB2, ColA2;
     int ColR3, ColG3, ColB3;
 
     char Beschreibung[100];      // Beschreibung des Levels
@@ -402,6 +404,7 @@ class TileEngineClass {
 
     void ClearLevel();                            // Level freigeben
     bool LoadLevel(const std::string &Filename);  // Level laden
+    void SaveLevel(const std::string &Filename);  // Save level
     void InitNewLevel(int xSize, int ySize);      // Neues Level initialisieren
     void CalcRenderRange();                       // Bereiche berechnen, die gerendert werden sollen
     void DrawBackground();                        // Hintergrund Layer zeichnen

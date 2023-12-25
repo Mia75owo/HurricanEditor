@@ -15,9 +15,11 @@
 // --------------------------------------------------------------------------------------
 
 #include <cmath>
+#include <cstring>
 #include <filesystem>
 #include <string>
 #include <algorithm>
+#include "Gegner.hpp"
 #include "ObjectList.hpp"
 namespace fs = std::filesystem;
 
@@ -54,6 +56,8 @@ float ShadowAlpha;
 // --------------------------------------------------------------------------------------
 
 TileEngineClass::TileEngineClass() {
+    Scale = 1.0f;
+
     bDrawShadow = false;
 
     XOffset = 0.0f;
@@ -184,7 +188,8 @@ void TileEngineClass::ClearLevel() {}
 // --------------------------------------------------------------------------------------
 
 bool TileEngineClass::LoadLevel(const std::string &Filename) {
-    FileHeader DateiHeader;  // Header der Level-Datei
+    ObjectList.ClearObjects();
+
     LevelObjectStruct LoadObject;
 
     // Dann checken, ob sich das File im Standard Ordner befindet
@@ -282,6 +287,7 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
 
     for (int i = 1; i < LEVELSIZE_X - 1; i++)
         for (int j = 2; j < LEVELSIZE_Y - 1; j++) {
+      #if 0
             // Schräge links hoch
             if (TileAt(i + 0, j + 0).Block & BLOCKWERT_WAND && !(TileAt(i + 1, j + 0).Block & BLOCKWERT_WAND) &&
                 TileAt(i + 1, j + 1).Block & BLOCKWERT_WAND && !(TileAt(i + 0, j - 1).Block & BLOCKWERT_WAND)) {
@@ -295,6 +301,7 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
                 if (!(TileAt(i - 1, j + 0).Block & BLOCKWERT_SCHRAEGE_R))
                     TileAt(i - 1, j + 0).Block ^= BLOCKWERT_SCHRAEGE_R;
             }
+      #endif
 
             // Wasseranim
             //
@@ -331,46 +338,53 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
         }
 
     // Objekt Daten laden und gleich Liste mit Objekten erstellen
-    if (DateiHeader.NumObjects > 0) {
-        for (int i = 0; i < static_cast<int>(DateiHeader.NumObjects); i++) {
-            Datei.read(reinterpret_cast<char *>(&LoadObject), sizeof(LoadObject));  // Objekt laden
+    for (int i = 0; i < static_cast<int>(DateiHeader.NumObjects); i++) {
+        Datei.read(reinterpret_cast<char *>(&LoadObject), sizeof(LoadObject));  // Objekt laden
 
-            LoadObject.ObjectID = FixEndian(LoadObject.ObjectID);
-            LoadObject.XPos = FixEndian(LoadObject.XPos);
-            LoadObject.YPos = FixEndian(LoadObject.YPos);
-            LoadObject.Value1 = FixEndian(LoadObject.Value1);
-            LoadObject.Value2 = FixEndian(LoadObject.Value2);
+        LoadObject.ObjectID = FixEndian(LoadObject.ObjectID);
+        LoadObject.XPos = FixEndian(LoadObject.XPos);
+        LoadObject.YPos = FixEndian(LoadObject.YPos);
+        LoadObject.Value1 = FixEndian(LoadObject.Value1);
+        LoadObject.Value2 = FixEndian(LoadObject.Value2);
 
-            // Startposition des Spielers
-            if (LoadObject.ObjectID == 0) {
-                XOffset = static_cast<float>(LoadObject.XPos) - static_cast<float>(DirectGraphics.RenderWidth) / 2;
-                YOffset = static_cast<float>(LoadObject.YPos) - static_cast<float>(DirectGraphics.RenderHeight) / 2;
-            } else {
-                // Gegner und andere Objekte laden und ins Level setzen
-                switch (LoadObject.ObjectID) {
-                    // Count Secrets, OneUps etc., for Summary-Box
-                    case SECRET:
-                        MaxSecrets++;
-                        break;
-                    case DIAMANT:
-                        MaxDiamonds++;
-                        break;
-                    case ONEUP:
-                        MaxOneUps++;
-                        break;
-                    case POWERBLOCK:
-                        MaxBlocks++;
-                        break;
+        // Gegner und andere Objekte laden und ins Level setzen
+        switch (LoadObject.ObjectID) {
+            // Count Secrets, OneUps etc., for Summary-Box
+            case SECRET:
+                MaxSecrets++;
+                break;
+            case DIAMANT:
+                MaxDiamonds++;
+                break;
+            case ONEUP:
+                MaxOneUps++;
+                break;
+            case POWERBLOCK:
+                MaxBlocks++;
+                break;
 
-                    default:
-                        break;
-                }
-
-                // Gegner laden, wenn er nicht schon geladen wurde
-                ObjectList.LoadObjectGraphic(LoadObject.ObjectID);
-                ObjectList.PushObject(LoadObject.ObjectID, LoadObject.XPos, LoadObject.YPos, LoadObject.Value1, LoadObject.Value2);
-            }
+            default:
+                break;
         }
+
+        // Startposition des Spielers
+        if (LoadObject.ObjectID == 0) {
+            XOffset = static_cast<float>(LoadObject.XPos) - static_cast<float>(DirectGraphics.RenderWidth) / 2;
+            YOffset = static_cast<float>(LoadObject.YPos) - static_cast<float>(DirectGraphics.RenderHeight) / 2;
+        } 
+
+        // Gegner laden, wenn er nicht schon geladen wurde
+        ObjectList.LoadObjectGraphic(LoadObject.ObjectID);
+        Object object {
+              LoadObject.ObjectID,
+              LoadObject.XPos,
+              LoadObject.YPos,
+              LoadObject.ChangeLight,
+              LoadObject.Skill,
+              LoadObject.Value1,
+              LoadObject.Value2,
+        };
+        ObjectList.PushObject(object);
     }
 
     Datei.read(reinterpret_cast<char *>(&DateiAppendix), sizeof(DateiAppendix));
@@ -395,8 +409,8 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     ColG2 = std::stoi(std::string(&DateiAppendix.Col2[2], 2), nullptr, 16);
     ColB2 = std::stoi(std::string(&DateiAppendix.Col2[4], 2), nullptr, 16);
     
-    int const ColA1 = std::stoi(std::string(&DateiAppendix.Col1[6], 2), nullptr, 16);
-    int const ColA2 = std::stoi(std::string(&DateiAppendix.Col2[6], 2), nullptr, 16);
+    ColA1 = std::stoi(std::string(&DateiAppendix.Col1[6], 2), nullptr, 16);
+    ColA2 = std::stoi(std::string(&DateiAppendix.Col2[6], 2), nullptr, 16);
 
     Col1 = D3DCOLOR_RGBA(ColR1, ColG1, ColB1, ColA1);
     Col2 = D3DCOLOR_RGBA(ColR2, ColG2, ColB2, ColA2);
@@ -424,6 +438,84 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     return true;
 }
 
+
+void TileEngineClass::SaveLevel(const std::string &Filename) {
+    // File öffnen
+    std::ofstream Datei(Filename, std::ofstream::binary);
+
+    Datei.write(reinterpret_cast<char *>(&DateiHeader), sizeof(DateiHeader));
+
+    LevelTileLoadStruct SaveTile;
+    for(int i = 0; i < LEVELSIZE_X; i++) {
+        for(int j = 0; j < LEVELSIZE_Y; j++) {
+          //if (tile.Block & BLOCKWERT_WASSER || tile.Block & BLOCKWERT_SUMPF)
+              //tile.Block ^= BLOCKWERT_LIQUID;
+
+            SaveTile.TileSetBack = Tiles[i][j].TileSetBack;
+            SaveTile.TileSetFront = Tiles[i][j].TileSetFront;
+            SaveTile.BackArt = Tiles[i][j].BackArt;
+            SaveTile.FrontArt = Tiles[i][j].FrontArt;
+            SaveTile.Red = Tiles[i][j].Red;
+            SaveTile.Green = Tiles[i][j].Green;
+            SaveTile.Blue = Tiles[i][j].Blue;
+            SaveTile.Alpha = Tiles[i][j].Alpha;
+            SaveTile.Block = Tiles[i][j].Block & ~BLOCKWERT_LIQUID;
+
+            Datei.write(reinterpret_cast<char *>(&SaveTile), sizeof(SaveTile));
+        }
+    }
+
+    LevelObjectStruct SaveObject;
+    for (auto& object: ObjectList.Objects) {
+        if (object.ObjectID == NULLENEMY) {
+            break;
+        }
+
+        SaveObject.ObjectID = object.ObjectID;
+        SaveObject.XPos = object.XPos;
+        SaveObject.YPos = object.YPos;
+        SaveObject.ChangeLight = object.ChangeLight;
+        SaveObject.Skill = object.Skill;
+        SaveObject.Value1 = object.Value1;
+        SaveObject.Value2 = object.Value2;
+
+        SaveObject.PADDING_CHUNK_1[0] = 0xcc;
+        SaveObject.PADDING_CHUNK_1[1] = 0xcc;
+
+        Datei.write(reinterpret_cast<char *>(&SaveObject), sizeof(SaveObject));
+    }
+
+    DateiAppendix.Taschenlampe = bDrawShadow;
+    DateiAppendix.UsedPowerblock = FixEndian(DateiAppendix.UsedPowerblock);
+
+
+    memset(DateiAppendix.Col1, 0, 8);
+    memset(DateiAppendix.Col2, 0, 8);
+
+    auto ColToString = [](int col) {
+        std::ostringstream TmpString;
+        TmpString << std::setfill('0') << std::setw(2) << std::hex << col;
+        auto str = TmpString.str();
+        std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+        return str;
+    };
+
+    std::memcpy(&DateiAppendix.Col1[0], ColToString(ColR1).c_str(), 2);
+    std::memcpy(&DateiAppendix.Col1[2], ColToString(ColG1).c_str(), 2);
+    std::memcpy(&DateiAppendix.Col1[4], ColToString(ColB1).c_str(), 2);
+
+    std::memcpy(&DateiAppendix.Col2[0], ColToString(ColR2).c_str(), 2);
+    std::memcpy(&DateiAppendix.Col2[2], ColToString(ColG2).c_str(), 2);
+    std::memcpy(&DateiAppendix.Col2[4], ColToString(ColB2).c_str(), 2);
+
+    std::memcpy(&DateiAppendix.Col1[6], ColToString(ColA1).c_str(), 2);
+    std::memcpy(&DateiAppendix.Col2[6], ColToString(ColA2).c_str(), 2);
+
+    Datei.write(reinterpret_cast<char *>(&DateiAppendix), sizeof(DateiAppendix));
+
+    Datei.close();
+}
+
 // --------------------------------------------------------------------------------------
 // Ausrechnen, welcher Levelausschnitt gerendert werden soll
 // --------------------------------------------------------------------------------------
@@ -432,8 +524,8 @@ void TileEngineClass::CalcRenderRange() {
     TileSizeX = ORIGINAL_TILE_SIZE_X * Scale;
     TileSizeY = ORIGINAL_TILE_SIZE_Y * Scale;
 
-    ScreenSizeTiles_X = DirectGraphics.RenderWidth / TileSizeX;
-    ScreenSizeTiles_Y = DirectGraphics.RenderHeight / TileSizeY;
+    ScreenSizeTilesX = DirectGraphics.RenderWidth / TileSizeX;
+    ScreenSizeTilesY = DirectGraphics.RenderHeight / TileSizeY;
 
     LEVELPIXELSIZE_X = LEVELSIZE_X * TileSizeX;
     LEVELPIXELSIZE_Y = LEVELSIZE_Y * TileSizeY;
@@ -466,13 +558,13 @@ void TileEngineClass::CalcRenderRange() {
     if (RenderPosY + yo < 0)
         RenderPosY = 0;
 
-    RenderPosXTo = ScreenSizeTiles_X + 2;
-    RenderPosYTo = ScreenSizeTiles_Y + 2;
+    RenderPosXTo = ScreenSizeTilesX + 2;
+    RenderPosYTo = ScreenSizeTilesY + 2;
 
     if (xo + RenderPosXTo > LEVELSIZE_X)
-        RenderPosXTo = ScreenSizeTiles_X;
+        RenderPosXTo = ScreenSizeTilesX;
     if (yo + RenderPosYTo > LEVELSIZE_Y)
-        RenderPosYTo = ScreenSizeTiles_Y;
+        RenderPosYTo = ScreenSizeTilesY;
 
     if (xo + RenderPosXTo > LEVELSIZE_X)
         RenderPosXTo = LEVELSIZE_X - xo;

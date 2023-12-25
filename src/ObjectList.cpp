@@ -215,23 +215,16 @@ SpriteData sprites[] = {
     { nullptr, 0, 0, 0, 0, 0, 0 }
 };
 
-void ObjectListClass::PushObject(uint32_t ID, int32_t x, int32_t y, int32_t Value1, int32_t Value2) {
-    if (ObjectIndex >= MAX_GEGNER)
+void ObjectListClass::PushObject(Object object) {
+    if (ObjectCount >= MAX_GEGNER)
         return;
 
-    Objects[ObjectIndex] = Object {
-        ID,
-        x,
-        y,
-        Value1,
-        Value2,
-    };
-
-    ObjectIndex++;
+    Objects[ObjectCount] = object;
+    ObjectCount++;
 }
 
 void ObjectListClass::DrawObject(int index, float xoff, float yoff, float scale) {
-    if (Objects[index].ObjectID == 0)
+    if (Objects[index].ObjectID == NULLENEMY)
         return;
 
     #ifndef NDEBUG
@@ -249,7 +242,7 @@ void ObjectListClass::DrawObject(int index, float xoff, float yoff, float scale)
 }
 
 void ObjectListClass::DrawAllObjects(float xoff, float yoff, float scale) {
-    for (unsigned int i = 0; i < ObjectIndex; i++) {
+    for (unsigned int i = 0; i < ObjectCount; i++) {
         DrawObject(i, xoff, yoff, scale);
     }
 }
@@ -274,10 +267,15 @@ void ObjectListClass::LoadAllGraphics() {
     }
 };
 
-ObjectListClass::ObjectListClass() {
+void ObjectListClass::ClearObjects() {
     for (auto& object : Objects) {
-        object = { 0, 0, 0, 0, 0 };
+        object = { NULLENEMY, 0, 0, 0, 0, 0, 0 };
     }
+    ObjectCount = 0;
+}
+
+ObjectListClass::ObjectListClass() {
+    ClearObjects();
 }
 ObjectListClass::~ObjectListClass() {
     for (int i = 0; i < MAX_GEGNERGFX; i++) {
