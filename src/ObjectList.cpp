@@ -13,10 +13,10 @@ struct SpriteData {
 };
 
 SpriteData sprites[] = {
-    { nullptr, 0, 0, 0, 0, 0, 0 }, // EXTRAS
-    { nullptr, 0, 0, 0, 0, 0, 0 }, // ONEUP
-    { nullptr, 0, 0, 0, 0, 0, 0 }, // DIAMANT
-    { nullptr, 0, 0, 0, 0, 0, 0 }, // POWERBLOCK
+    { "extras.png", 312, 24, 24, 24, 13, 1 }, // EXTRAS
+    { "oneup.png", 200, 160, 40, 40, 5, 4 }, // ONEUP
+    { "diamant.png", 261, 29, 29, 29, 9, 1 }, // DIAMANT
+    { "powerblock.png", 440, 40, 40, 40, 11, 1 }, // POWERBLOCK
     { "spitter.png", 110, 23, 22, 23, 5, 1 },
     { "enemy-walker.png", 360, 180, 45, 45, 8, 4 },
     { "enemy-guntower.png", 300, 120, 60, 40, 5, 3 },
