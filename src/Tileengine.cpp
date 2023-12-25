@@ -448,9 +448,6 @@ void TileEngineClass::SaveLevel(const std::string &Filename) {
     LevelTileLoadStruct SaveTile;
     for(int i = 0; i < LEVELSIZE_X; i++) {
         for(int j = 0; j < LEVELSIZE_Y; j++) {
-          //if (tile.Block & BLOCKWERT_WASSER || tile.Block & BLOCKWERT_SUMPF)
-              //tile.Block ^= BLOCKWERT_LIQUID;
-
             SaveTile.TileSetBack = Tiles[i][j].TileSetBack;
             SaveTile.TileSetFront = Tiles[i][j].TileSetFront;
             SaveTile.BackArt = Tiles[i][j].BackArt;

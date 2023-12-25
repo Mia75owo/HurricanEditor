@@ -1,3 +1,5 @@
+// FIXME: water displaying causes artifacts when zooming out
+
 #include <string>
 
 #include "DX8Graphics.hpp"
@@ -72,6 +74,9 @@ int main() {
             case SDLK_8: LoadMap(8); break;
             case SDLK_9: LoadMap(9); break;
             case SDLK_0: LoadMap(10); break;
+            case SDLK_s:
+              TileEngine.SaveLevel("test.map");
+            break;
           }
         default:
           break;
@@ -83,9 +88,19 @@ int main() {
     OldMouseY = MouseY;
     MouseMask = SDL_GetMouseState(&MouseX, &MouseY);
 
-    if (MouseMask & (SDL_BUTTON_LEFT)) {
+    //if (MouseMask & (SDL_BUTTON_LEFT)) {
+    if (MouseMask & (SDL_BUTTON(1))) {
       TileEngine.XOffset += OldMouseX - MouseX;
       TileEngine.YOffset += OldMouseY - MouseY;
+    }
+
+    //if (MouseMask & (SDL_BUTTON_RIGHT)) {
+    if (MouseMask & (SDL_BUTTON(3))) {
+        const int x_tile = MouseX / TileEngine.TileSizeX + TileEngine.XOffset / TileEngine.TileSizeX;
+        const int y_tile = MouseY / TileEngine.TileSizeY + TileEngine.YOffset / TileEngine.TileSizeY;
+        TileEngine.TileAt(x_tile, y_tile).FrontArt = 0;
+        TileEngine.TileAt(x_tile, y_tile).BackArt = 0;
+        TileEngine.TileAt(x_tile, y_tile).Block = 0;
     }
 
     if (KeyDown(SDLK_LEFT)) {

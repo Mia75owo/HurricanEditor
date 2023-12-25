@@ -331,8 +331,6 @@ class TileEngineClass {
     VERTEX2D TilesToRender[TilesToRenderMax * 6];    // Alle zu rendernden Leveltiles
     VERTEX2D v1, v2, v3, v4;                // Vertices zum Sprite rendern
     unsigned char LoadedTilesets;           // Anzahl geladener Sets
-    LevelTileStruct Tiles[MAX_LEVELSIZE_X]  // Array mit Leveldaten
-                         [MAX_LEVELSIZE_Y];
 
     WaterSinTableClass WaterSinTable;
 
@@ -365,6 +363,9 @@ class TileEngineClass {
     FileAppendix DateiAppendix;  // Anhang der Level-Datei
 
   public:
+    LevelTileStruct Tiles[MAX_LEVELSIZE_X]  // Array mit Leveldaten
+                         [MAX_LEVELSIZE_Y];
+
     float Scale = 1.0f;
     float TileSizeX;
     float TileSizeY;
