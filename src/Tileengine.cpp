@@ -1394,51 +1394,57 @@ void TileEngineClass::DrawWater() {
     // Wasserfall rendern
     xScreen = static_cast<float>(-xTileOffs + RenderPosX * TileSizeX);
     yScreen = static_cast<float>(-yTileOffs + RenderPosY * TileSizeY);
-    {
-        for (int j = RenderPosY; j < RenderPosYTo; j++) {
-            xScreen = static_cast<float>(-xTileOffs + RenderPosX * TileSizeX);
+    for (int j = RenderPosY; j < RenderPosYTo; j++) {
+        xScreen = static_cast<float>(-xTileOffs + RenderPosX * TileSizeX);
 
-            for (int i = RenderPosX; i < RenderPosXTo; i++) {
-                // Ist ein Wasserfall teil?
-                if (TileAt(i + xLevel, j + yLevel).Block & BLOCKWERT_WASSERFALL) {
-                    DirectGraphics.SetColorKeyMode();
-                    // Drei Schichten Wasserfall rendern =)
-                    //
+        for (int i = RenderPosX; i < RenderPosXTo; i++) {
+            // Ist ein Wasserfall teil?
+            if (TileAt(i + xLevel, j + yLevel).Block & BLOCKWERT_WASSERFALL) {
+                DirectGraphics.SetColorKeyMode();
+                // Drei Schichten Wasserfall rendern =)
+                //
 
-                    // Schicht 1
-                    int xoff = (i + xLevel) % 3 * TileSizeX;
-                    int yoff = (j + yLevel) % 3 * TileSizeY + 120 - static_cast<int>(WasserfallOffset);
+                // Schicht 1
+                int xoff = (i + xLevel) % 3 * ORIGINAL_TILE_SIZE_X;
+                int yoff = (j + yLevel) % 3 * ORIGINAL_TILE_SIZE_Y + 120 - static_cast<int>(WasserfallOffset);
 
-                    Wasserfall[0].SetRect(xoff, yoff, xoff + TileSizeX, yoff + TileSizeY);
-                    Wasserfall[0].RenderSprite(static_cast<float>(i * TileSizeX - xTileOffs),
-                                               static_cast<float>(j * TileSizeY - yTileOffs), Col1);
+                Wasserfall[0].SetRect(xoff, yoff, xoff + ORIGINAL_TILE_SIZE_X, yoff + ORIGINAL_TILE_SIZE_Y);
+                Wasserfall[0].RenderSpriteWithScale(static_cast<float>(i * TileSizeX - xTileOffs),
+                                           static_cast<float>(j * TileSizeY - yTileOffs), Scale, Col1);
 
-                    // Schicht 2
-                    //
-                    xoff = (i + xLevel + 1) % 3 * TileSizeX;
-                    yoff = (j + yLevel) % 3 * TileSizeY + 120 - static_cast<int>(WasserfallOffset / 2.0f);
+                // Schicht 2
+                //
+                xoff = (i + xLevel + 1) % 3 * ORIGINAL_TILE_SIZE_X;
+                yoff = (j + yLevel) % 3 * ORIGINAL_TILE_SIZE_Y + 120 - static_cast<int>(WasserfallOffset / 2.0f);
 
-                    Wasserfall[0].SetRect(xoff, yoff, xoff + TileSizeX, yoff + TileSizeY);
-                    Wasserfall[0].RenderSprite(static_cast<float>(i * TileSizeX - xTileOffs),
-                                               static_cast<float>(j * TileSizeY - yTileOffs), Col2);
+                Wasserfall[0].SetRect(xoff, yoff, xoff + ORIGINAL_TILE_SIZE_X, yoff + ORIGINAL_TILE_SIZE_Y);
+                Wasserfall[0].RenderSpriteWithScale(static_cast<float>(i * TileSizeX - xTileOffs),
+                                           static_cast<float>(j * TileSizeY - yTileOffs), Scale, Col2);
 
-                    // Glanzschicht (Schicht 3) drüber
-                    //
-                    Wasserfall[1].SetRect((int)(i * TileSizeX - xTileOffs) % RENDERWIDTH,
-                                          (int)(j * TileSizeY - yTileOffs) % RENDERHEIGHT,
-                                          (int)(i * TileSizeX - xTileOffs) % RENDERWIDTH + TileSizeX,
-                                          (int)(j * TileSizeY - yTileOffs) % RENDERHEIGHT + TileSizeY);
+                // Glanzschicht (Schicht 3) drüber
+                //
 
-                    Wasserfall[1].RenderSprite(static_cast<float>(i * TileSizeX - xTileOffs),
-                                               static_cast<float>(j * TileSizeY - yTileOffs),
-                                               D3DCOLOR_RGBA(180, 240, 255, 60));
-                }
+                // FIXME: this has some displaying errors
+#if 0
+                Wasserfall[1].SetRect(
+                    (i * ORIGINAL_TILE_SIZE_X - (int)(xTileOffs / Scale)) % 640,
+                    (j * ORIGINAL_TILE_SIZE_Y - (int)(yTileOffs / Scale)) % 480,
+                    (i * ORIGINAL_TILE_SIZE_X - (int)(xTileOffs / Scale)) % 640 + ORIGINAL_TILE_SIZE_X,
+                    (j * ORIGINAL_TILE_SIZE_Y - (int)(yTileOffs / Scale)) % 480 + ORIGINAL_TILE_SIZE_Y);
 
-                xScreen += TileSizeX;  // Am Screen weiter
+                Wasserfall[1].RenderSpriteWithScale(
+                                           static_cast<float>(i * TileSizeX - xTileOffs),
+                                           static_cast<float>(j * TileSizeY - yTileOffs),
+                                           Scale,
+                                           D3DCOLOR_RGBA(180, 240, 255, 60));
+#endif
+ 
             }
 
-            yScreen += TileSizeY;  // Am Screen weiter
+            xScreen += TileSizeX;  // Am Screen weiter
         }
+
+        yScreen += TileSizeY;  // Am Screen weiter
     }
 
     DirectGraphics.SetFilterMode(false);

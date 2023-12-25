@@ -25,10 +25,11 @@ void LoadMap(int index);
 
 int main() {
   DirectGraphics.Init(640, 480, 32, false);
+  TileEngine.LoadSprites();
+
   KeyBuffer = SDL_GetKeyboardState(&NumberOfKeys);
 
-  TileEngine.LoadLevel(g_storage_ext + "/data/levels/temple.map");
-  TileEngine.LoadLevel(g_storage_ext + "/data/levels/cave.map");
+  TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
 
   Timer.SetMaxFPS(60);
   Timer.update();
