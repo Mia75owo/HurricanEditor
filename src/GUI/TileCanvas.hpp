@@ -15,6 +15,10 @@ private:
   void Render();
   wxGLContext* context;
 
+  wxPoint mousePos;
+  bool mouseLeft;
+  bool mouseRight;
+
 protected:
   DECLARE_EVENT_TABLE()
 };

@@ -39,6 +39,36 @@ TileCanvas::TileCanvas(wxPanel* parent)
     DirectGraphics.ResizeToWindow(size.GetWidth(), size.GetHeight());
   });
 
+  mouseLeft = false;
+  mouseRight = false;
+  Bind(wxEVT_LEFT_DOWN, [&](wxMouseEvent& evt) {
+    mouseLeft = true;
+    evt.Skip();
+  });
+  Bind(wxEVT_LEFT_UP, [&](wxMouseEvent& evt) {
+    mouseLeft = false;
+    evt.Skip();
+  });
+  Bind(wxEVT_RIGHT_DOWN, [&](wxMouseEvent& evt) {
+    mouseRight = true;
+    evt.Skip();
+  });
+  Bind(wxEVT_RIGHT_UP, [&](wxMouseEvent& evt) {
+    mouseRight = false;
+    evt.Skip();
+  });
+
+
+  Bind(wxEVT_MOTION, [&](wxMouseEvent& evt) {
+    if (evt.Dragging() && mouseRight) {
+      auto delta = mousePos - evt.GetPosition();
+
+      TileEngine.XOffset += delta.x;
+      TileEngine.YOffset += delta.y;
+    }
+
+    mousePos = evt.GetPosition();
+  });
 }
 
 void TileCanvas::Render() {
