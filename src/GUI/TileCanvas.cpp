@@ -69,6 +69,13 @@ TileCanvas::TileCanvas(wxPanel* parent)
 
     mousePos = evt.GetPosition();
   });
+  Bind(wxEVT_MOUSEWHEEL, [&](wxMouseEvent& evt) {
+    if (evt.GetWheelRotation() > 0) {
+      TileEngine.ZoomBy(0.1);
+    } else {
+      TileEngine.ZoomBy(-0.1);
+    }
+  });
 }
 
 void TileCanvas::Render() {
