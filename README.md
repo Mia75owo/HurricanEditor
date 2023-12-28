@@ -10,7 +10,7 @@ The only purpose of me making this is: fun.
 
 ### Dependencies
 
-The code depends on SDL2 with the image component, and libepoxy.
+The code depends on SDL2 with the image component, wxWidgets and libepoxy.
 A compiler with c++17 support is required.
 
 ### Building
