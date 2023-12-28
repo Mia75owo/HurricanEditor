@@ -12,12 +12,17 @@ enum IDs {
 MainFrame::MainFrame(const wxString& title)
     : wxFrame(nullptr, wxID_ANY, title) {
 
-  auto bar = CreateStatusBar();
-  bar->SetDoubleBuffered(true);
-
   panel = new wxPanel(this);
 
+  sizer = new wxBoxSizer(wxVERTICAL);
+  sizer->Add(panel, 1, wxEXPAND);
+
+  this->SetSizerAndFit(sizer);
+}
 
 void MainFrame::Init() {
   canvas = new TileCanvas(panel);
+  canvasSizer = new wxBoxSizer(wxVERTICAL);
+  canvasSizer->Add(canvas, 1, wxEXPAND);
+  panel->SetSizerAndFit(canvasSizer);
 }

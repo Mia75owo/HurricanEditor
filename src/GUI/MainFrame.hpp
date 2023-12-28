@@ -15,6 +15,8 @@ class MainFrame : public wxFrame {
 
  private:
   wxPanel* panel;
+  wxSizer* sizer;
+  wxSizer* canvasSizer;
 };
 
 #endif

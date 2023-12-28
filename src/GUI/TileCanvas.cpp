@@ -26,6 +26,11 @@ TileCanvas::TileCanvas(wxPanel* parent)
   Protokoll << "\n-> OpenGL init successful!\n" << std::endl;
 
   TileEngine.LoadSprites();
+  Bind(wxEVT_SIZE, [&](wxSizeEvent&){
+    auto size = this->GetSize();
+    DirectGraphics.ResizeToWindow(size.GetWidth(), size.GetHeight());
+  });
+
 }
 
 void TileCanvas::Render() {}
