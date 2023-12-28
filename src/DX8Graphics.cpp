@@ -59,7 +59,7 @@ DirectGraphicsClass::~DirectGraphicsClass() {}
 // --------------------------------------------------------------------------------------
 // D3D Initialisieren
 // --------------------------------------------------------------------------------------
-bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, std::uint32_t dwZ_Bits, bool VSync) {
+bool DirectGraphicsClass::Init() {
     int ScreenWidth = SCREENWIDTH;
     int ScreenHeight = SCREENHEIGHT;
     RenderWidth = SCREENWIDTH;

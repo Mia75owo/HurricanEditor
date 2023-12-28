@@ -98,7 +98,7 @@ class DirectGraphicsClass {
     DirectGraphicsClass();   // Konstruktor
     ~DirectGraphicsClass();  // Desktruktor
 
-    bool Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, std::uint32_t dwZ_Bits, bool VSync);
+    bool Init();
     bool Exit();  // D3D beenden
     bool SetDeviceInfo();
 

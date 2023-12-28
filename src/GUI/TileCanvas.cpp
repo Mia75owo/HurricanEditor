@@ -18,7 +18,7 @@ END_EVENT_TABLE()
 TileCanvas::TileCanvas(wxPanel* parent)
     : wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, 0,
                  wxT("GLCanvas")) {
-  DirectGraphics.Init(640, 480, 32, false);
+  DirectGraphics.Init();
 
   context = new wxGLContext(this);
   context->SetCurrent(*this);
