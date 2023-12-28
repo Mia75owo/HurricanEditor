@@ -78,18 +78,18 @@ TileCanvas::TileCanvas(wxPanel* parent)
   });
 }
 
+void TileCanvas::Update() {
+  Timer.update();
+  TileEngine.UpdateLevel();
+  TileEngine.CalcRenderRange();
+}
+
 void TileCanvas::Render() {
   context->SetCurrent(*this);
 
-  Timer.update();
-
-  TileEngine.UpdateLevel();
-
   DirectGraphics.ClearBackBuffer();
-
   DirectGraphics.SetColorKeyMode();
 
-  TileEngine.CalcRenderRange();
   TileEngine.DrawBackground();
 
   TileEngine.DrawBackLevel();

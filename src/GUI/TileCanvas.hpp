@@ -12,6 +12,7 @@ class TileCanvas : public wxGLCanvas {
   void PaintIt(wxPaintEvent&) { Render(); }
 
 private:
+  void Update();
   void Render();
   wxGLContext* context;
 
