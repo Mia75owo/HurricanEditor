@@ -60,12 +60,8 @@ DirectGraphicsClass::~DirectGraphicsClass() {}
 // D3D Initialisieren
 // --------------------------------------------------------------------------------------
 bool DirectGraphicsClass::Init() {
-    int ScreenWidth = SCREENWIDTH;
-    int ScreenHeight = SCREENHEIGHT;
     RenderWidth = SCREENWIDTH;
     RenderHeight = SCREENHEIGHT;
-
-    int const ScreenDepth = 32;
 
     Protokoll << "\n--> SDL/OpenGL init <--\n";
     Protokoll << "---------------------\n" << std::endl;
@@ -100,7 +96,6 @@ bool DirectGraphicsClass::Exit() {
     return true;
 }
 
-// FIXME: this
 void DirectGraphicsClass::ResizeToWindow(int width, int height) {
   RenderWidth = width;
   RenderHeight = height;
