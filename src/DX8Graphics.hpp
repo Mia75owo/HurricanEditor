@@ -84,7 +84,6 @@ class DirectGraphicsClass {
     glm::mat4x4 matProjWindow;
     glm::mat4x4 matProjRender;
 
-    SDL_Window *Window;
     SDL_GLContext GLcontext;
     SDL_Rect WindowView;
     SDL_Rect RenderRect;
@@ -92,7 +91,7 @@ class DirectGraphicsClass {
   public:
     int RenderWidth;
     int RenderHeight;
-    void ResizeToWindow();
+    void ResizeToWindow(int width, int height);
 
     void ShowBackBuffer();  // Present aufrufen
 

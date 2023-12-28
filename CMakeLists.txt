@@ -22,11 +22,12 @@ endif()
 
         #src/Main.cpp
 set(EDITOR_SOURCES
-        src/App.cpp
-        src/App.hpp
-
-        src/MainFrame.cpp
-        src/MainFrame.hpp
+        src/GUI/App.cpp
+        src/GUI/App.hpp
+        src/GUI/MainFrame.cpp
+        src/GUI/MainFrame.hpp
+        src/GUI/TileCanvas.cpp
+        src/GUI/TileCanvas.hpp
 
         src/ObjectList.cpp
         src/ObjectList.hpp
@@ -112,6 +113,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VER
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
     target_link_libraries(${PROJECT_NAME} c++fs)
 endif()
+
+#target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/IncludeEpoxy.hpp)
 
 find_package(wxWidgets REQUIRED COMPONENTS net core base gl)
 include(${wxWidgets_USE_FILE})

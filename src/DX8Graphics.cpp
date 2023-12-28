@@ -67,8 +67,6 @@ bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, st
 
     int const ScreenDepth = 32;
 
-    uint32_t flags = SDL_WINDOW_OPENGL;
-
     Protokoll << "\n--> SDL/OpenGL init <--\n";
     Protokoll << "---------------------\n" << std::endl;
 
@@ -80,44 +78,29 @@ bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, st
     }
     Protokoll << "SDL initialized." << std::endl;
 
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);  //      (Can now be changed via command line switch)
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    //SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);  //      (Can now be changed via command line switch)
+    //SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    //SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+    //SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    //SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);          // DKS - No need for a depth buffer in this game
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);  // DKS - Changed this to 0 (Game would not load w/ GL1.2 laptop)
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    //SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);          // DKS - No need for a depth buffer in this game
+    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);  // DKS - Changed this to 0 (Game would not load w/ GL1.2 laptop)
+    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    // Setup SDL Screen
-    //if (isFullscreen) {
-        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-    //}
-
-    flags |= SDL_WINDOW_RESIZABLE;
-
-    // Create a window. Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
-    Window =
-        SDL_CreateWindow("Hurrican", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, flags);
-    if (Window == nullptr) {
-        Protokoll << "Failed to create " << ScreenWidth << "x" << ScreenHeight
-                  << " window: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     // Create an OpenGL context associated with the window.
-    GLcontext = SDL_GL_CreateContext(Window);
-    if (GLcontext == nullptr) {
-        Protokoll << "Failed to create GL context: " << SDL_GetError() << std::endl;
-        return false;
-    }
+    //GLcontext = SDL_GL_CreateContext(Window);
+    //if (GLcontext == nullptr) {
+        //Protokoll << "Failed to create GL context: " << SDL_GetError() << std::endl;
+        //return false;
+    //}
 
-    SDL_ShowCursor(SDL_ENABLE);
+    //SDL_ShowCursor(SDL_ENABLE);
 
+#if 0
     // If not using EGL, i.e. using SDL's GL handling, some more handling of
     //  Vsync is necessary now that context has been created:
     {
@@ -155,17 +138,11 @@ bool DirectGraphicsClass::Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, st
             }
         }
     }
-
-    if (!SetDeviceInfo())
-        return false;
-
-    Protokoll << "\n-> OpenGL init successful!\n" << std::endl;
+#endif
 
     // DegreetoRad-Tabelle füllen
     for (int i = 0; i < 360; i++)
         DegreetoRad[i] = PI * static_cast<float>(i) / 180.0f;
-
-    SetColorKeyMode();
 
     return true;
 }
@@ -180,17 +157,13 @@ bool DirectGraphicsClass::Exit() {
     Shaders[PROGRAM_RENDER].Close();
 
     SDL_GL_DeleteContext(GLcontext);
-    SDL_DestroyWindow(Window);
     SDL_Quit();
     Protokoll << "-> SDL/OpenGL shutdown successfully completed !" << std::endl;
     return true;
 }
 
-void DirectGraphicsClass::ResizeToWindow() {
-  int width;
-  int height;
-  SDL_GetWindowSize(Window, &width, &height);
-
+// FIXME: this
+void DirectGraphicsClass::ResizeToWindow(int width, int height) {
   RenderWidth = width;
   RenderHeight = height;
 
@@ -450,7 +423,7 @@ void DirectGraphicsClass::SetTexture(int idx) {
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::ShowBackBuffer() {
-    SDL_GL_SwapWindow(Window);
+    //SDL_GL_SwapWindow(Window);
 
 #ifndef NDEBUG
     int error = glGetError();
@@ -464,12 +437,8 @@ void DirectGraphicsClass::ShowBackBuffer() {
 
 void DirectGraphicsClass::SetupFramebuffers() {
 /* Read the current window size */
-    {
-        int tmp_w, tmp_h;
-        SDL_GetWindowSize(Window, &tmp_w, &tmp_h);
-        WindowView.w = tmp_w;
-        WindowView.h = tmp_h;
-    }
+    WindowView.w = RenderWidth;
+    WindowView.h = RenderHeight;
     Protokoll << "Window resolution: " << WindowView.w << "x" << WindowView.h << std::endl;
 
     WindowView.x = 0;
