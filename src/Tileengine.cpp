@@ -158,6 +158,32 @@ void TileEngineClass::Zoom(float times) {
 
     Scale *= times;
 }
+void TileEngineClass::ZoomBy(float times) {
+    float OriginalScale = Scale;
+
+    Scale += times;
+
+    CalcRenderRange();
+
+    // Cap the zoom
+    if (times < 1.0f && LEVELPIXELSIZE_X <= DirectGraphics.RenderWidth
+      ||times < 1.0f && LEVELPIXELSIZE_Y <= DirectGraphics.RenderHeight) {
+        Scale = OriginalScale;
+        CalcRenderRange();
+        return;
+    }
+
+    Scale = OriginalScale;
+
+    // Center screen again
+    const float aspect = (Scale + times) / Scale;
+    const float screenaspectx = (DirectGraphics.RenderWidth * aspect) - DirectGraphics.RenderWidth;
+    const float screenaspecty = (DirectGraphics.RenderHeight * aspect) - DirectGraphics.RenderHeight;
+    XOffset = XOffset * aspect + screenaspectx / 2.0f;
+    YOffset = YOffset * aspect + screenaspecty / 2.0f;
+
+    Scale += times;
+}
 
 // --------------------------------------------------------------------------------------
 // Neues, leeres Level der Grösse xSize/ySize erstellen

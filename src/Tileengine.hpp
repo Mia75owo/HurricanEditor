@@ -400,6 +400,7 @@ class TileEngineClass {
     ~TileEngineClass();  // Destruktor
 
     void Zoom(float times);
+    void ZoomBy(float times);
 
     void LoadSprites();
 
