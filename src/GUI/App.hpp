@@ -3,10 +3,14 @@
 
 #include <epoxy/gl.h>
 #include <wx/wx.h>
+#include "GUI/MainFrame.hpp"
 
 class App : public wxApp {
  public:
   bool OnInit();
+
+ private:
+  MainFrame* frame;
 };
 
 #endif

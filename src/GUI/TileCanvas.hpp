@@ -7,13 +7,16 @@
 #include <wx/wx.h>
 
 class TileCanvas : public wxGLCanvas {
-  void Render();
-
-  wxGLContext* context;
-
  public:
   TileCanvas(wxPanel* parent);
   void PaintIt(wxPaintEvent&) { Render(); }
+
+private:
+  void Render();
+  wxGLContext* context;
+
+protected:
+  DECLARE_EVENT_TABLE()
 };
 
 #endif

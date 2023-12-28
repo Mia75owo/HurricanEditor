@@ -4,19 +4,20 @@
 #include <wx/wx.h>
 
 #include "GUI/TileCanvas.hpp"
+#include "Tileengine.hpp"
 
 enum IDs {
-  BUTTON_ID = 2,
-  SLIDER_ID,
-  TEXT_ID,
 };
 
 MainFrame::MainFrame(const wxString& title)
     : wxFrame(nullptr, wxID_ANY, title) {
-  auto panel = new wxPanel(this);
 
   auto bar = CreateStatusBar();
   bar->SetDoubleBuffered(true);
 
-  auto tileCanvas = new TileCanvas(panel);
+  panel = new wxPanel(this);
+
+
+void MainFrame::Init() {
+  canvas = new TileCanvas(panel);
 }

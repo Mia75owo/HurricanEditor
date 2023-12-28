@@ -26,10 +26,11 @@ const Uint8* KeyBuffer;
 int NumberOfKeys;
 
 bool App::OnInit() {
-  MainFrame* mainFrame = new MainFrame("Hurrican Editor");
-  mainFrame->SetClientSize(800, 600);
-  mainFrame->Center();
-  mainFrame->Show();
+  frame = new MainFrame("Hurrican Editor");
+  frame->SetClientSize(800, 600);
+  frame->Center();
+  frame->Show();
 
+  frame->Init();
   return true;
 }
