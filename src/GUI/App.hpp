@@ -10,6 +10,8 @@ class App : public wxApp {
   bool OnInit();
 
  private:
+  void OnIdle(wxIdleEvent& evt);
+
   MainFrame* frame;
 };
 

@@ -32,5 +32,12 @@ bool App::OnInit() {
   frame->Show();
 
   frame->Init();
+
+  Connect(wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(App::OnIdle));
   return true;
+}
+
+void App::OnIdle(wxIdleEvent& evt) {
+  frame->canvas->Refresh();
+  evt.RequestMore();
 }
