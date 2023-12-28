@@ -93,8 +93,6 @@ class DirectGraphicsClass {
     int RenderHeight;
     void ResizeToWindow(int width, int height);
 
-    void ShowBackBuffer();  // Present aufrufen
-
     DirectGraphicsClass();   // Konstruktor
     ~DirectGraphicsClass();  // Desktruktor
 
@@ -111,8 +109,6 @@ class DirectGraphicsClass {
                         std::uint32_t PrimitiveCount,  // eines jeden Frames komplett in
                         void *pVertexStreamZeroData);  // den Backbuffer gerendert wird
 
-    void DisplayBuffer();  // Render den Buffer auf den Backbuffer
-    // DKS - SetTexture is now used for both GL and DirectX, and uses new TexturesystemClass:
     void SetTexture(int idx);
     bool ExtensionSupported(const char *ext);
     void SetupFramebuffers();

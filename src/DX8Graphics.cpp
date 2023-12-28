@@ -322,15 +322,6 @@ void DirectGraphicsClass::RendertoBuffer(GLenum PrimitiveType,
     }
 }
 
-// --------------------------------------------------------------------------------------
-// Render den Buffer auf den Backbuffer
-// --------------------------------------------------------------------------------------
-
-void DirectGraphicsClass::DisplayBuffer() {
-    // Backbuffer mit Frontbuffer tauschen
-    ShowBackBuffer();
-}
-
 bool DirectGraphicsClass::ExtensionSupported(const char *ext) {
     if (strstr(glextensions, ext) != nullptr) {
         Protokoll << ext << " is supported" << std::endl;
@@ -349,23 +340,6 @@ void DirectGraphicsClass::SetTexture(int idx) {
     } else {
         use_shader = shader_t::COLOR;
     }
-}
-
-// --------------------------------------------------------------------------------------
-// Present aufrufen
-// --------------------------------------------------------------------------------------
-
-void DirectGraphicsClass::ShowBackBuffer() {
-    //SDL_GL_SwapWindow(Window);
-
-#ifndef NDEBUG
-    int error = glGetError();
-
-    if (error != 0) {
-        Protokoll << "GL Error " << std::hex << error << " file " << __FILE__ << ": line " << std::dec << __LINE__
-                  << std::endl;
-    }
-#endif
 }
 
 void DirectGraphicsClass::SetupFramebuffers() {

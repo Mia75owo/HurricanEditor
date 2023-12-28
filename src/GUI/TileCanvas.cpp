@@ -104,9 +104,6 @@ void TileCanvas::Render() {
   TileEngine.DrawOverlayLevel();
   //TileEngine.DrawShadow();
 
-  DirectGraphics.DisplayBuffer();
-
-  
   glFlush();
   SwapBuffers();
 }
