@@ -78,68 +78,6 @@ bool DirectGraphicsClass::Init() {
     }
     Protokoll << "SDL initialized." << std::endl;
 
-    //SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);  //      (Can now be changed via command line switch)
-    //SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    //SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-
-    //SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-    //SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
-
-    //SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);          // DKS - No need for a depth buffer in this game
-    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);  // DKS - Changed this to 0 (Game would not load w/ GL1.2 laptop)
-    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-
-    //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    // Create an OpenGL context associated with the window.
-    //GLcontext = SDL_GL_CreateContext(Window);
-    //if (GLcontext == nullptr) {
-        //Protokoll << "Failed to create GL context: " << SDL_GetError() << std::endl;
-        //return false;
-    //}
-
-    //SDL_ShowCursor(SDL_ENABLE);
-
-#if 0
-    // If not using EGL, i.e. using SDL's GL handling, some more handling of
-    //  Vsync is necessary now that context has been created:
-    {
-        int retval = -1;
-        if (VSync) {
-            // Beginning with SDL 2.0, we set vsync directly with function.
-            // First, try setting it to -1, which requests 'late swap tearing', which
-            //  will not wait for vsync if previous frame was missed:
-
-            Protokoll << "-> Requesting SDL2 GL to enable VSync with 'late swap tearing' (optimal)" << std::endl;
-            retval = SDL_GL_SetSwapInterval(-1);
-            if (retval < 0) {
-                Protokoll << "-> 'Late swap tearing' VSync not supported:\n" << SDL_GetError() << std::endl;
-                Protokoll << "-> Requesting SDL2 GL to enable standard VSync" << std::endl;
-                retval = SDL_GL_SetSwapInterval(1);
-                if (retval < 0) {
-                    Protokoll << "-> *** SDL2 GL failed to enable VSync:\n" << SDL_GetError() << std::endl;
-                    VSyncEnabled = false;
-                } else {
-                    Protokoll << "-> VSync enabled successfully" << std::endl;
-                    VSyncEnabled = true;
-                }
-            } else {
-                Protokoll << "-> VSync with late-swap-tearing enabled successfully" << std::endl;
-                VSyncEnabled = true;
-            }
-        } else {
-            Protokoll << "-> Requesting SDL2 GL to disable VSync" << std::endl;
-            retval = SDL_GL_SetSwapInterval(0);
-            if (retval < 0) {
-                Protokoll << "-> *** SDL2 GL failed to disable VSync:\n" << SDL_GetError() << std::endl;
-                VSyncEnabled = true;
-            } else {
-                VSyncEnabled = false;
-            }
-        }
-    }
-#endif
-
     // DegreetoRad-Tabelle füllen
     for (int i = 0; i < 360; i++)
         DegreetoRad[i] = PI * static_cast<float>(i) / 180.0f;
