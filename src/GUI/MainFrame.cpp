@@ -9,6 +9,7 @@
 enum IDs {
   ID_LOAD = 2,
   ID_SAVE = 3,
+  ID_RESET_ZOOM = 4,
 };
 
 MainFrame::MainFrame(const wxString& title)
@@ -19,9 +20,12 @@ MainFrame::MainFrame(const wxString& title)
   menuFile->Append(ID_SAVE, "&Save Map", "Saves a Hurrican map file to a path");
   menuFile->AppendSeparator();
   menuFile->Append(wxID_EXIT);
+  auto menuEditor = new wxMenu;
+  menuEditor->Append(ID_RESET_ZOOM, "&Reset Zoom", "Sets the Zoom of the Level back to 1.0");
 
   auto menuBar = new wxMenuBar;
   menuBar->Append(menuFile, "&File");
+  menuBar->Append(menuEditor, "&Editor");
   SetMenuBar(menuBar);
 
   Bind(wxEVT_MENU, [&](wxCommandEvent&) {
@@ -39,6 +43,9 @@ MainFrame::MainFrame(const wxString& title)
       return;
     TileEngine.SaveLevel(fileDialog.GetPath().ToStdString());
   }, ID_SAVE);
+  Bind(wxEVT_MENU, [&](wxCommandEvent&) {
+    TileEngine.Scale = 1.0f;
+  }, ID_RESET_ZOOM);
 
   panel = new wxPanel(this);
 
