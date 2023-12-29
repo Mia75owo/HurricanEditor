@@ -10,6 +10,8 @@ public:
 
 private:
   TileMap* tileMap;
+
+  wxBoxSizer* sizer;
 };
 
 #endif

@@ -9,15 +9,19 @@ class TileMap : public wxPanel {
   bool LoadTileMap(wxString path, wxBitmapType type);
 
   void PaintIt(wxPaintEvent&) {
-    Update();
-    Render();
+    wxPaintDC dc(this);
+    Resize(dc);
+    Render(dc);
   }
 
  private:
-  wxBitmap image;
+  wxImage image;
+  wxBitmap resized;
 
-  void Update();
-  void Render();
+  void Render(wxDC& dc);
+  void Resize(wxDC& dc);
+
+  wxSize size;
 
  protected:
   DECLARE_EVENT_TABLE()
