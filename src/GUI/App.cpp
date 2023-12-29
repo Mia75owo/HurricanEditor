@@ -22,8 +22,6 @@ TimerClass Timer;
 TileEngineClass TileEngine;
 ObjectListClass ObjectList;
 
-const Uint8* KeyBuffer;
-int NumberOfKeys;
 
 bool App::OnInit() {
   wxInitAllImageHandlers();
