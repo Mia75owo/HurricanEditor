@@ -22,6 +22,7 @@ TimerClass Timer;
 TileEngineClass TileEngine;
 ObjectListClass ObjectList;
 
+MainFrame* frame;
 
 bool App::OnInit() {
   wxInitAllImageHandlers();

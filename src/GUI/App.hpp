@@ -11,8 +11,8 @@ class App : public wxApp {
 
  private:
   void OnIdle(wxIdleEvent& evt);
-
-  MainFrame* frame;
 };
+
+extern MainFrame* frame;
 
 #endif
