@@ -3,11 +3,7 @@
 
 #include <wx/bmpbndl.h>
 #include <wx/wx.h>
-
-struct TileImage {
-  wxString Path;
-  wxImage Image;
-};
+#include <map>
 
 class TileSet : public wxPanel {
  public:
@@ -20,8 +16,11 @@ class TileSet : public wxPanel {
     Render(dc);
   }
 
+  void Select(wxString name);
+
  private:
-  std::vector<TileImage> images;
+  std::map<wxString, wxImage> images;
+  wxString currentImage;
 
   wxBitmap resized;
 

@@ -1,6 +1,7 @@
 #include "TileSet.hpp"
 
 #include <wx/wx.h>
+#include <wx/filename.h>
 #include "Tileengine.hpp"
 
 BEGIN_EVENT_TABLE(TileSet, wxPanel)
@@ -15,24 +16,42 @@ TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
 }
 
 bool TileSet::LoadTileSet(wxString path, wxBitmapType type) {
-  bool allreadyLoaded = std::any_of(images.cbegin(), images.cend(), [&](const TileImage& img){
-    return img.Path == path;
-  });
+  auto filename = wxFileName(path).GetFullName();
+
+  bool allreadyLoaded = images.find(filename) != images.end();
   if (allreadyLoaded)
     return true;
 
-  TileImage tileImage;
-  bool success = tileImage.Image.LoadFile(path, type);
+  wxImage image;
+
+  bool success = image.LoadFile(path, type);
 
   if (success) {
     int sizeX = TILESETSIZE_X - static_cast<int>(TILESETSIZE_X) % ORIGINAL_TILE_SIZE_X;
     int sizeY = TILESETSIZE_X - static_cast<int>(TILESETSIZE_Y) % ORIGINAL_TILE_SIZE_Y;
-    tileImage.Image = tileImage.Image.GetSubImage(wxRect(0, 0, sizeX, sizeY));
-    tileImage.Path = path;
-    images.push_back(tileImage);
+    image = image.GetSubImage(wxRect(0, 0, sizeX, sizeY));
+
+    bool firstLoaded = images.empty();
+
+    images.emplace(filename, image);
+
+    if (firstLoaded) 
+      currentImage = filename;
   }
 
   return success;
+}
+
+void TileSet::Select(wxString name) {
+  auto idx = images.find(name);
+  if (idx == images.end())
+    return;
+
+  currentImage = name;
+
+  resized = wxBitmap(images[currentImage].Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
+
+  Refresh();
 }
 
 void TileSet::Render(wxDC& dc) {
@@ -42,6 +61,6 @@ void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
   if (newSize != size) {
     size = newSize;
-    resized = wxBitmap(images[0].Image.Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
+    resized = wxBitmap(images[currentImage].Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
   }
 }
