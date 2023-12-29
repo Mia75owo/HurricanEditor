@@ -12,6 +12,9 @@ public:
 private:
   TileSet* tileSet;
 
+  wxPanel* controls;
+  wxStaticText* positionText;
+
   wxBoxSizer* sizer;
 };
 
