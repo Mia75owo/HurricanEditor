@@ -4,13 +4,8 @@
 
 #include "GUI/EditMenu.hpp"
 #include "GUI/TileCanvas.hpp"
+#include "GUI/IDs.hpp"
 #include "Tileengine.hpp"
-
-enum IDs {
-  ID_LOAD = 2,
-  ID_SAVE = 3,
-  ID_RESET_ZOOM = 4,
-};
 
 MainFrame::MainFrame(const wxString& title)
     : wxFrame(nullptr, wxID_ANY, title) {
