@@ -6,7 +6,7 @@ BEGIN_EVENT_TABLE(TileMap, wxPanel)
 EVT_PAINT(TileMap::PaintIt)
 END_EVENT_TABLE()
 
-TileMap::TileMap(wxPanel* parent) : wxPanel(parent) {
+TileMap::TileMap(wxWindow* parent) : wxPanel(parent) {
   Bind(wxEVT_SIZE, [&](wxSizeEvent& evt) {
     Refresh();
     evt.Skip();

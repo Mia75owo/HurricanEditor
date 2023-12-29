@@ -3,7 +3,7 @@
 
 #include <wx/wx.h>
 
-EditMenu::EditMenu(wxPanel* parent) : wxPanel(parent) {
+EditMenu::EditMenu(wxWindow* parent) : wxPanel(parent) {
   wxInitAllImageHandlers();
 
   tileMap = new TileMap(this);

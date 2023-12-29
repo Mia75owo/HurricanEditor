@@ -5,7 +5,7 @@
 
 class TileMap : public wxPanel {
  public:
-  TileMap(wxPanel* parent);
+  TileMap(wxWindow* parent);
   bool LoadTileMap(wxString path, wxBitmapType type);
 
   void PaintIt(wxPaintEvent&) {

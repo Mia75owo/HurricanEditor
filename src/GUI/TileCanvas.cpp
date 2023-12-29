@@ -15,7 +15,7 @@ BEGIN_EVENT_TABLE(TileCanvas, wxGLCanvas)
 EVT_PAINT(TileCanvas::PaintIt)
 END_EVENT_TABLE()
 
-TileCanvas::TileCanvas(wxPanel* parent)
+TileCanvas::TileCanvas(wxWindow* parent)
     : wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, 0,
                  wxT("GLCanvas")) {
   DirectGraphics.Init();

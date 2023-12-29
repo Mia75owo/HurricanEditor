@@ -8,7 +8,7 @@
 
 class TileCanvas : public wxGLCanvas {
  public:
-  TileCanvas(wxPanel* parent);
+  TileCanvas(wxWindow* parent);
   void PaintIt(wxPaintEvent&) { Update(); Render(); }
 
 private:
