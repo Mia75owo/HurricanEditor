@@ -13,6 +13,7 @@ private:
   TileSet* tileSet;
 
   wxPanel* controls;
+  wxChoice* setsChoice;
   wxStaticText* positionText;
 
   wxBoxSizer* sizer;

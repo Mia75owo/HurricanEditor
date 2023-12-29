@@ -42,7 +42,7 @@ MainFrame::MainFrame(const wxString& title)
     TileEngine.ZoomBy(1.0f - TileEngine.Scale);
   }, ID_RESET_ZOOM);
 
-  mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER);
+  mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER | wxSP_LIVE_UPDATE);
 
   sizer = new wxBoxSizer(wxVERTICAL);
   sizer->Add(mainSplitter, 1, wxEXPAND);

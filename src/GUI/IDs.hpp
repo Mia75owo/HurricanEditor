@@ -5,6 +5,7 @@ enum IDs {
   ID_LOAD = 2,
   ID_SAVE = 3,
   ID_RESET_ZOOM = 4,
+  ID_TILESET_CHOICE = 5,
 };
 
 #endif
