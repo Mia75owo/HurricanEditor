@@ -33,9 +33,10 @@ TileCanvas::TileCanvas(wxWindow* parent)
   TileEngine.LoadSprites();
   TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
 
-  Bind(wxEVT_SIZE, [&](wxSizeEvent&){
+  Bind(wxEVT_SIZE, [&](wxSizeEvent& evt) {
     auto size = this->GetSize();
     DirectGraphics.ResizeToWindow(size.GetWidth(), size.GetHeight());
+    evt.Skip();
   });
 
   mouseLeft = false;
@@ -57,7 +58,6 @@ TileCanvas::TileCanvas(wxWindow* parent)
     evt.Skip();
   });
 
-
   Bind(wxEVT_MOTION, [&](wxMouseEvent& evt) {
     if (evt.Dragging() && mouseRight) {
       auto delta = mousePos - evt.GetPosition();
@@ -67,6 +67,7 @@ TileCanvas::TileCanvas(wxWindow* parent)
     }
 
     mousePos = evt.GetPosition();
+    evt.Skip();
   });
   Bind(wxEVT_MOUSEWHEEL, [&](wxMouseEvent& evt) {
     if (evt.GetWheelRotation() > 0) {
@@ -74,6 +75,7 @@ TileCanvas::TileCanvas(wxWindow* parent)
     } else {
       TileEngine.ZoomBy(-0.1);
     }
+    evt.Skip();
   });
 }
 
@@ -106,14 +108,15 @@ void TileCanvas::Render() {
   TileEngine.DrawBackLevel();
   TileEngine.DrawFrontLevel();
 
-  ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset, TileEngine.Scale);
+  ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
+                            TileEngine.Scale);
 
   DirectGraphics.SetColorKeyMode();
 
   TileEngine.DrawWater();
   TileEngine.DrawBackLevelOverlay();
   TileEngine.DrawOverlayLevel();
-  //TileEngine.DrawShadow();
+  // TileEngine.DrawShadow();
 
   glFlush();
   SwapBuffers();
