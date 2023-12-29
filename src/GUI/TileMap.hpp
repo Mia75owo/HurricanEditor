@@ -21,7 +21,7 @@ class TileMap : public wxPanel {
   void Render(wxDC& dc);
   void Resize(wxDC& dc);
 
-  wxSize size;
+  int size;
 
  protected:
   DECLARE_EVENT_TABLE()

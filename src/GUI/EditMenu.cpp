@@ -4,8 +4,6 @@
 #include <wx/wx.h>
 
 EditMenu::EditMenu(wxWindow* parent) : wxPanel(parent) {
-  wxInitAllImageHandlers();
-
   tileMap = new TileMap(this);
   sizer = new wxBoxSizer(wxVERTICAL);
 }

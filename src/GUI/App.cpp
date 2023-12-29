@@ -26,6 +26,8 @@ const Uint8* KeyBuffer;
 int NumberOfKeys;
 
 bool App::OnInit() {
+  wxInitAllImageHandlers();
+
   frame = new MainFrame("Hurrican Editor");
   frame->SetClientSize(800, 600);
   frame->Center();
