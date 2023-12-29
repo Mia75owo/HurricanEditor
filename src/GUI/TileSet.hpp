@@ -1,5 +1,5 @@
-#ifndef TILE_MAP_HPP_
-#define TILE_MAP_HPP_
+#ifndef TILE_SET_HPP_
+#define TILE_SET_HPP_
 
 #include <wx/bmpbndl.h>
 #include <wx/wx.h>
@@ -9,10 +9,10 @@ struct TileImage {
   wxImage Image;
 };
 
-class TileMap : public wxPanel {
+class TileSet : public wxPanel {
  public:
-  TileMap(wxWindow* parent);
-  bool LoadTileMap(wxString path, wxBitmapType type);
+  TileSet(wxWindow* parent);
+  bool LoadTileSet(wxString path, wxBitmapType type);
 
   void PaintIt(wxPaintEvent&) {
     wxPaintDC dc(this);

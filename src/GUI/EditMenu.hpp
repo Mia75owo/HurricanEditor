@@ -2,7 +2,7 @@
 #define EDIT_MENU_HPP_
 
 #include <wx/wx.h>
-#include "GUI/TileMap.hpp"
+#include "GUI/TileSet.hpp"
 
 class EditMenu : public wxPanel {
 public:
@@ -10,7 +10,7 @@ public:
   void Init();
 
 private:
-  TileMap* tileMap;
+  TileSet* tileSet;
 
   wxBoxSizer* sizer;
 };

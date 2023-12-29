@@ -1,20 +1,20 @@
-#include "TileMap.hpp"
+#include "TileSet.hpp"
 
 #include <wx/wx.h>
 #include "Tileengine.hpp"
 
-BEGIN_EVENT_TABLE(TileMap, wxPanel)
-EVT_PAINT(TileMap::PaintIt)
+BEGIN_EVENT_TABLE(TileSet, wxPanel)
+EVT_PAINT(TileSet::PaintIt)
 END_EVENT_TABLE()
 
-TileMap::TileMap(wxWindow* parent) : wxPanel(parent) {
+TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
   Bind(wxEVT_SIZE, [&](wxSizeEvent& evt) {
     Refresh();
     evt.Skip();
   });
 }
 
-bool TileMap::LoadTileMap(wxString path, wxBitmapType type) {
+bool TileSet::LoadTileSet(wxString path, wxBitmapType type) {
   bool allreadyLoaded = std::any_of(images.cbegin(), images.cend(), [&](const TileImage& img){
     return img.Path == path;
   });
@@ -35,10 +35,10 @@ bool TileMap::LoadTileMap(wxString path, wxBitmapType type) {
   return success;
 }
 
-void TileMap::Render(wxDC& dc) {
+void TileSet::Render(wxDC& dc) {
   dc.DrawBitmap(resized, 0, 0, false);
 }
-void TileMap::Resize(wxDC& dc) {
+void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
   if (newSize != size) {
     size = newSize;
