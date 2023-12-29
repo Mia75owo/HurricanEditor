@@ -63,4 +63,6 @@ void MainFrame::Init() {
   mainSplitter->SplitVertically(canvas, editMenu);
   mainSplitter->SetMinimumPaneSize(200);
   mainSplitter->SetSashGravity(1.0);
+
+  editMenu->Init();
 }

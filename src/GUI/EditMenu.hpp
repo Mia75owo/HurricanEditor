@@ -7,6 +7,7 @@
 class EditMenu : public wxPanel {
 public:
   EditMenu(wxWindow* parent);
+  void Init();
 
 private:
   TileMap* tileMap;

@@ -7,9 +7,13 @@ EditMenu::EditMenu(wxWindow* parent) : wxPanel(parent) {
   wxInitAllImageHandlers();
 
   tileMap = new TileMap(this);
-  tileMap->LoadTileMap(wxT("../data/textures/s_Jungle.png"), wxBITMAP_TYPE_PNG);
-
   sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(tileMap, 1, wxEXPAND);
+}
+
+void EditMenu::Init() {
+  tileMap->LoadTileMap(wxT("../data/textures/s_Jungle.png"), wxBITMAP_TYPE_PNG);
+  tileMap->SetBackgroundColour(wxColor(0, 0, 0));
+
+  sizer->Add(tileMap, 1, wxSHAPED);
   this->SetSizerAndFit(sizer);
 }
