@@ -4,7 +4,23 @@
 #include <wx/wx.h>
 
 class TileMap : public wxPanel {
-  TileMap(wxPanel *parent);
+ public:
+  TileMap(wxPanel* parent);
+  bool LoadTileMap(wxString path, wxBitmapType type);
+
+  void PaintIt(wxPaintEvent&) {
+    Update();
+    Render();
+  }
+
+ private:
+  wxBitmap image;
+
+  void Update();
+  void Render();
+
+ protected:
+  DECLARE_EVENT_TABLE()
 };
 
 #endif
