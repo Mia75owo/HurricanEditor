@@ -3,7 +3,7 @@
 
 #include <epoxy/gl.h>
 #include <wx/wx.h>
-#include <wx/glcanvas.h>
+#include <wx/splitter.h>
 #include "GUI/EditMenu.hpp"
 #include "GUI/TileCanvas.hpp"
 
@@ -16,9 +16,8 @@ class MainFrame : public wxFrame {
   EditMenu* editMenu;
 
  private:
-  wxPanel* panel;
+  wxSplitterWindow* mainSplitter;
   wxSizer* sizer;
-  wxSizer* mainSizer;
 };
 
 #endif

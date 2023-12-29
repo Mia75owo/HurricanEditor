@@ -47,21 +47,20 @@ MainFrame::MainFrame(const wxString& title)
     TileEngine.ZoomBy(1.0f - TileEngine.Scale);
   }, ID_RESET_ZOOM);
 
-  panel = new wxPanel(this);
+  mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_BORDER);
 
   sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(panel, 1, wxEXPAND);
-
+  sizer->Add(mainSplitter, 1, wxEXPAND);
   this->SetSizerAndFit(sizer);
 }
 
 void MainFrame::Init() {
-  canvas = new TileCanvas(panel);
-  mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  mainSizer->Add(canvas, 4, wxEXPAND);
-  panel->SetSizerAndFit(mainSizer);
+  canvas = new TileCanvas(mainSplitter);
 
-  editMenu = new EditMenu(panel);
+  editMenu = new EditMenu(mainSplitter);
   editMenu->SetBackgroundColour(wxColor(100, 200, 100));
-  mainSizer->Add(editMenu, 1, wxEXPAND | wxLEFT, 5);
+
+  mainSplitter->SplitVertically(canvas, editMenu);
+  mainSplitter->SetMinimumPaneSize(200);
+  mainSplitter->SetSashGravity(1.0);
 }
