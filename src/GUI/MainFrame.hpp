@@ -4,6 +4,7 @@
 #include <epoxy/gl.h>
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
+#include "GUI/EditMenu.hpp"
 #include "GUI/TileCanvas.hpp"
 
 class MainFrame : public wxFrame {
@@ -12,11 +13,12 @@ class MainFrame : public wxFrame {
   void Init();
 
   TileCanvas* canvas;
+  EditMenu* editMenu;
 
  private:
   wxPanel* panel;
   wxSizer* sizer;
-  wxSizer* canvasSizer;
+  wxSizer* mainSizer;
 };
 
 #endif

@@ -24,6 +24,8 @@ endif()
 set(EDITOR_SOURCES
         src/GUI/App.cpp
         src/GUI/App.hpp
+        src/GUI/EditMenu.cpp
+        src/GUI/EditMenu.hpp
         src/GUI/MainFrame.cpp
         src/GUI/MainFrame.hpp
         src/GUI/TileCanvas.cpp

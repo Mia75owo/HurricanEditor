@@ -2,6 +2,7 @@
 
 #include <wx/wx.h>
 
+#include "GUI/EditMenu.hpp"
 #include "GUI/TileCanvas.hpp"
 #include "Tileengine.hpp"
 
@@ -56,7 +57,11 @@ MainFrame::MainFrame(const wxString& title)
 
 void MainFrame::Init() {
   canvas = new TileCanvas(panel);
-  canvasSizer = new wxBoxSizer(wxVERTICAL);
-  canvasSizer->Add(canvas, 1, wxEXPAND);
-  panel->SetSizerAndFit(canvasSizer);
+  mainSizer = new wxBoxSizer(wxHORIZONTAL);
+  mainSizer->Add(canvas, 4, wxEXPAND);
+  panel->SetSizerAndFit(mainSizer);
+
+  editMenu = new EditMenu(panel);
+  editMenu->SetBackgroundColour(wxColor(100, 200, 100));
+  mainSizer->Add(editMenu, 1, wxEXPAND | wxLeft, 5);
 }
