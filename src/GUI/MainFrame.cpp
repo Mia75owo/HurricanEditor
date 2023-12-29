@@ -44,7 +44,7 @@ MainFrame::MainFrame(const wxString& title)
     TileEngine.SaveLevel(fileDialog.GetPath().ToStdString());
   }, ID_SAVE);
   Bind(wxEVT_MENU, [&](wxCommandEvent&) {
-    TileEngine.Scale = 1.0f;
+    TileEngine.ZoomBy(1.0f - TileEngine.Scale);
   }, ID_RESET_ZOOM);
 
   panel = new wxPanel(this);
