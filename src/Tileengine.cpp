@@ -248,8 +248,13 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     bScrollBackground = DateiHeader.ScrollBackground;
 
     // Benutzte Tilesets laden
-    for (int i = 0; i < LoadedTilesets; i++)
+    for (int i = 0; i < LoadedTilesets; i++) {
         TileGfx[i].LoadImage(DateiHeader.SetNames[i], 256, 256, TileSizeX, TileSizeY, 12, 12);
+        std::string str = DateiHeader.SetNames[i];
+        if (!str.empty()) {
+            LoadedTilesetPaths.push_back(str);
+        }
+    }
 
     // Benutzte Hintergrundgrafiken laden
 

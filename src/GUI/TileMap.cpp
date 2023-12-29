@@ -15,12 +15,21 @@ TileMap::TileMap(wxWindow* parent) : wxPanel(parent) {
 }
 
 bool TileMap::LoadTileMap(wxString path, wxBitmapType type) {
-  bool success = image.LoadFile(path, type);
+  bool allreadyLoaded = std::any_of(images.cbegin(), images.cend(), [&](const TileImage& img){
+    return img.Path == path;
+  });
+  if (allreadyLoaded)
+    return true;
+
+  TileImage tileImage;
+  bool success = tileImage.Image.LoadFile(path, type);
 
   if (success) {
     int sizeX = TILESETSIZE_X - static_cast<int>(TILESETSIZE_X) % ORIGINAL_TILE_SIZE_X;
     int sizeY = TILESETSIZE_X - static_cast<int>(TILESETSIZE_Y) % ORIGINAL_TILE_SIZE_Y;
-    image = image.GetSubImage(wxRect(0, 0, sizeX, sizeY));
+    tileImage.Image = tileImage.Image.GetSubImage(wxRect(0, 0, sizeX, sizeY));
+    tileImage.Path = path;
+    images.push_back(tileImage);
   }
 
   return success;
@@ -33,6 +42,6 @@ void TileMap::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
   if (newSize != size) {
     size = newSize;
-    resized = wxBitmap(image.Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
+    resized = wxBitmap(images[0].Image.Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
   }
 }

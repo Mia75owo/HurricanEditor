@@ -384,6 +384,8 @@ class TileEngineClass {
 
     float SinPos2;  // Position in der SinusListe für den Wasserhintergrund
 
+    std::vector<std::string> LoadedTilesetPaths;
+
     DirectGraphicsSprite Background;             // Hintergrund
     //DirectGraphicsSprite ParallaxLayer[3];       // Anzahl der Layer
     //DirectGraphicsSprite GameOver;               // GameOver Symbol

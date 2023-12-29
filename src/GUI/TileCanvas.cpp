@@ -31,7 +31,6 @@ TileCanvas::TileCanvas(wxWindow* parent)
   Protokoll << "\n-> OpenGL init successful!\n" << std::endl;
 
   TileEngine.LoadSprites();
-
   TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
 
   Bind(wxEVT_SIZE, [&](wxSizeEvent&){

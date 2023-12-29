@@ -1,7 +1,13 @@
 #ifndef TILE_MAP_HPP_
 #define TILE_MAP_HPP_
 
+#include <wx/bmpbndl.h>
 #include <wx/wx.h>
+
+struct TileImage {
+  wxString Path;
+  wxImage Image;
+};
 
 class TileMap : public wxPanel {
  public:
@@ -15,7 +21,8 @@ class TileMap : public wxPanel {
   }
 
  private:
-  wxImage image;
+  std::vector<TileImage> images;
+
   wxBitmap resized;
 
   void Render(wxDC& dc);
