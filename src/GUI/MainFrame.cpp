@@ -1,6 +1,5 @@
 #include "MainFrame.hpp"
 
-#include <wx/event.h>
 #include <wx/wx.h>
 
 #include "GUI/TileCanvas.hpp"
@@ -29,7 +28,7 @@ MainFrame::MainFrame(const wxString& title)
   SetMenuBar(menuBar);
 
   Bind(wxEVT_MENU, [&](wxCommandEvent&) {
-    wxFileDialog fileDialog(this, _("Open map File"), "", "",
+    wxFileDialog fileDialog(this, _("Open map File"), "../data/levels", "",
                        "map files (*.map)|*.map", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
     if (fileDialog.ShowModal() == wxID_CANCEL)
       return;
@@ -37,8 +36,8 @@ MainFrame::MainFrame(const wxString& title)
     TileEngine.LoadLevel(fileDialog.GetPath().ToStdString());
   }, ID_LOAD);
   Bind(wxEVT_MENU, [&](wxCommandEvent&) {
-    wxFileDialog fileDialog(this, _("Save map File"), "", "",
-                       "map files (*.map)|*.map", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+    wxFileDialog fileDialog(this, _("Save map File"), "../data/levels", "",
+                       "map files (*.map)|*.map", wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if (fileDialog.ShowModal() == wxID_CANCEL)
       return;
     TileEngine.SaveLevel(fileDialog.GetPath().ToStdString());
