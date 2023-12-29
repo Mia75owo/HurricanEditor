@@ -11,6 +11,8 @@ class TileCanvas : public wxGLCanvas {
   TileCanvas(wxWindow* parent);
   void PaintIt(wxPaintEvent&) { Update(); Render(); }
 
+  wxPoint GetTileCordsUnderCursor();
+
 private:
   void Update();
   void Render();

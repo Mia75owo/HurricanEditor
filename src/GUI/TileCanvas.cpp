@@ -77,6 +77,18 @@ TileCanvas::TileCanvas(wxWindow* parent)
   });
 }
 
+wxPoint TileCanvas::GetTileCordsUnderCursor() {
+  const wxPoint scaledOffset =
+      wxPoint(TileEngine.XOffset / TileEngine.TileSizeX,
+              TileEngine.YOffset / TileEngine.TileSizeY);
+  const wxPoint scaledMouse = wxPoint(mousePos.x / TileEngine.TileSizeX,
+                                      mousePos.y / TileEngine.TileSizeY);
+
+  const wxPoint relative = scaledMouse + scaledOffset;
+
+return relative;
+}
+
 void TileCanvas::Update() {
   Timer.update();
   TileEngine.UpdateLevel();
