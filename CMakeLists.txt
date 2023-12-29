@@ -30,6 +30,8 @@ set(EDITOR_SOURCES
         src/GUI/MainFrame.hpp
         src/GUI/TileCanvas.cpp
         src/GUI/TileCanvas.hpp
+        src/GUI/TileMap.cpp
+        src/GUI/TileMap.hpp
 
         src/ObjectList.cpp
         src/ObjectList.hpp

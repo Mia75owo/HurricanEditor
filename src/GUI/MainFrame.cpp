@@ -63,5 +63,5 @@ void MainFrame::Init() {
 
   editMenu = new EditMenu(panel);
   editMenu->SetBackgroundColour(wxColor(100, 200, 100));
-  mainSizer->Add(editMenu, 1, wxEXPAND | wxLeft, 5);
+  mainSizer->Add(editMenu, 1, wxEXPAND | wxLEFT, 5);
 }
