@@ -384,7 +384,7 @@ class TileEngineClass {
 
     float SinPos2;  // Position in der SinusListe für den Wasserhintergrund
 
-    std::vector<std::string> LoadedTilesetPaths;
+    std::vector<std::pair<std::string, int>> LoadedTilesetPathsWithID;
 
     DirectGraphicsSprite Background;             // Hintergrund
     //DirectGraphicsSprite ParallaxLayer[3];       // Anzahl der Layer

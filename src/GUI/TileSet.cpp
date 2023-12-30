@@ -24,7 +24,7 @@ TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
   });
 }
 
-bool TileSet::LoadTileSet(wxString path, wxBitmapType type) {
+bool TileSet::LoadTileSet(wxString path, int tileSetID, wxBitmapType type) {
   auto filename = wxFileName(path).GetFullName();
 
   bool allreadyLoaded = images.find(filename) != images.end();
@@ -40,9 +40,13 @@ bool TileSet::LoadTileSet(wxString path, wxBitmapType type) {
     int sizeY = TILESETSIZE_X - static_cast<int>(TILESETSIZE_Y) % ORIGINAL_TILE_SIZE_Y;
     image = image.GetSubImage(wxRect(0, 0, sizeX, sizeY));
 
+    LoadedTileSet tileSet;
+    tileSet.image = image;
+    tileSet.tileSetID = tileSetID;
+
     bool firstLoaded = images.empty();
 
-    images.emplace(filename, image);
+    images.emplace(filename, tileSet);
 
     if (firstLoaded) 
       currentImage = filename;
@@ -58,7 +62,7 @@ void TileSet::Select(wxString name) {
 
   currentImage = name;
 
-  resized = wxBitmap(images[currentImage].Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
+  resized = wxBitmap(images[currentImage].image.Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
 
   Refresh();
 }
@@ -117,6 +121,6 @@ void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
   if (newSize != size) {
     size = newSize;
-    resized = wxBitmap(images[currentImage].Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
+    resized = wxBitmap(images[currentImage].image.Scale(size, size/*, wxIMAGE_QUALITY_HIGH*/));
   }
 }

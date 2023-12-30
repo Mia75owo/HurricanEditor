@@ -5,10 +5,15 @@
 #include <wx/wx.h>
 #include <map>
 
+struct LoadedTileSet {
+  wxImage image;
+  int tileSetID;
+};
+
 class TileSet : public wxPanel {
  public:
   TileSet(wxWindow* parent);
-  bool LoadTileSet(wxString path, wxBitmapType type);
+  bool LoadTileSet(wxString path, int tileSetID, wxBitmapType type);
 
   void PaintIt(wxPaintEvent&) {
     wxPaintDC dc(this);
@@ -21,7 +26,7 @@ class TileSet : public wxPanel {
   int SelectedTileID();
 
  private:
-  std::map<wxString, wxImage> images;
+  std::map<wxString, LoadedTileSet> images;
   wxString currentImage;
 
   wxBitmap resized;

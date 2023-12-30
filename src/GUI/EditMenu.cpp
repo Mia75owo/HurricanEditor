@@ -24,10 +24,10 @@ void EditMenu::Init() {
   tileSet->SetBackgroundColour(wxColor(0, 0, 0));
   controls->SetBackgroundColour(wxColor(200, 100, 100));
 
-  for (auto& tileSetName : TileEngine.LoadedTilesetPaths) {
+  for (auto& loadedTileSet : TileEngine.LoadedTilesetPathsWithID) {
     // TODO: make non hardcoded
-    tileSet->LoadTileSet(wxString::Format("../data/textures/%s", tileSetName), wxBITMAP_TYPE_PNG);
-    setsChoice->Append(tileSetName);
+    tileSet->LoadTileSet(wxString::Format("../data/textures/%s", loadedTileSet.first), loadedTileSet.second, wxBITMAP_TYPE_PNG);
+    setsChoice->Append(loadedTileSet.first);
   }
   setsChoice->Select(0);
 

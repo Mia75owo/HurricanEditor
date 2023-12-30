@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <string>
 #include <algorithm>
+#include <utility>
 #include "Gegner.hpp"
 #include "ObjectList.hpp"
 namespace fs = std::filesystem;
@@ -252,7 +253,7 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
         TileGfx[i].LoadImage(DateiHeader.SetNames[i], 256, 256, TileSizeX, TileSizeY, 12, 12);
         std::string str = DateiHeader.SetNames[i];
         if (!str.empty()) {
-            LoadedTilesetPaths.push_back(str);
+            LoadedTilesetPathsWithID.push_back(std::make_pair(str, i));
         }
     }
 
