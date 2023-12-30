@@ -56,6 +56,21 @@ void TileSet::Select(wxString name) {
 
 void TileSet::Render(wxDC& dc) {
   dc.DrawBitmap(resized, 0, 0, false);
+
+  const int tilesX = floor(TILESETSIZE_X / ORIGINAL_TILE_SIZE_X);
+  const int tilesY = floor(TILESETSIZE_Y / ORIGINAL_TILE_SIZE_Y);
+
+  const float tileSizeX = size / static_cast<float>(tilesX);
+  const float tileSizeY = size / static_cast<float>(tilesY);
+
+  const int width = 3;
+
+  for (int i = 1; i < tilesX; i++) {
+    dc.DrawRectangle(i * tileSizeX - width / 2.0f, 0, width, size);
+  }
+  for (int i = 1; i < tilesY; i++) {
+    dc.DrawRectangle(0, i * tileSizeY - width / 2.0f, size, width);
+  }
 }
 void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
