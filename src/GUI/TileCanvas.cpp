@@ -147,6 +147,7 @@ void TileCanvas::Render() {
       TileEngine.DrawFrontLevel();
       ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
                                 TileEngine.Scale);
+      TileEngine.DrawBackLevelOverlay();
       TileEngine.DrawWater();
       break;
     case EDIT_MODE_VIEW:
