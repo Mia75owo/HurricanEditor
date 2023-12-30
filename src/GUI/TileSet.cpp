@@ -20,7 +20,7 @@ TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
   });
   Bind(wxEVT_LEFT_DOWN, [&](wxMouseEvent&) {
     int tile = GetTileUnderCursor(mousePos);
-    SelectTile(tile);
+    SetSelectedTileID(tile);
   });
 }
 
@@ -67,13 +67,24 @@ void TileSet::Select(wxString name) {
   Refresh();
 }
 
-void TileSet::SelectTile(int tileID) {
+void TileSet::SetSelectedTileID(int tileID) {
   if (tileID < 0 || tileID >= 143)
     return;
 
   selectedTile = tileID;
 
   Refresh();
+}
+
+int TileSet::GetSelectedTileID() {
+  return selectedTile;
+}
+int TileSet::GetSelectedTileSetID() {
+  auto current = images.find(currentImage);
+  if (current == images.end())
+    return 0;
+
+  return (*current).second.tileSetID;
 }
 
 int TileSet::GetTileUnderCursor(wxPoint cursor) {

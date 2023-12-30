@@ -22,8 +22,9 @@ class TileSet : public wxPanel {
   }
 
   void Select(wxString name);
-  void SelectTile(int tileID);
-  int SelectedTileID();
+  void SetSelectedTileID(int tileID);
+  int GetSelectedTileID();
+  int GetSelectedTileSetID();
 
  private:
   std::map<wxString, LoadedTileSet> images;
