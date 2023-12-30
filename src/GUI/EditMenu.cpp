@@ -9,12 +9,15 @@
 EditMenu::EditMenu(wxWindow* parent) : wxPanel(parent) {
   tileSet = new TileSet(this);
   sizer = new wxBoxSizer(wxVERTICAL);
-  //tileSetSizer = new wxBoxSizer(wxVERTICAL);
-  //controlsSizer = new wxBoxSizer(wxVERTICAL);
 
   controls = new wxPanel(this);
-  positionText = new wxStaticText(controls, wxID_ANY, "", wxPoint(0, 40));;
+
   setsChoice = new wxChoice(controls, ID_TILESET_CHOICE, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_SORT);
+  setsChoiceSizer = new wxBoxSizer(wxVERTICAL);
+
+  tileInfoBox = new wxStaticBox(controls, wxID_ANY, "Tile Info:");
+  tileInfoBoxSizer = new wxStaticBoxSizer(tileInfoBox, wxVERTICAL);
+  positionText = new wxStaticText(tileInfoBox, wxID_ANY, "");;
 }
 
 void EditMenu::Init() {
@@ -28,12 +31,22 @@ void EditMenu::Init() {
   }
   setsChoice->Select(0);
 
+  auto font = wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+  positionText->SetFont(font);
+
+  tileInfoBox->SetFont(font);
+  tileInfoBoxSizer->Add(positionText, 0, wxEXPAND);
+
+  setsChoiceSizer->Add(setsChoice, 0, wxEXPAND);
+  setsChoiceSizer->Add(tileInfoBoxSizer, 0, wxEXPAND, 10);
+  controls->SetSizerAndFit(setsChoiceSizer);
+
   sizer->Add(tileSet, 0, wxSHAPED|wxEXPAND);
-  sizer->Add(controls, 1);
+  sizer->Add(controls, 1, wxEXPAND);
 
   sizer->SetSizeHints(this);
-
   this->SetSizerAndFit(sizer);
+
 
   // =====
   // BINDS

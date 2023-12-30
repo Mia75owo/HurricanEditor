@@ -14,9 +14,13 @@ private:
 
   wxPanel* controls;
   wxChoice* setsChoice;
+
+  wxStaticBox* tileInfoBox;
   wxStaticText* positionText;
 
   wxBoxSizer* sizer;
+  wxBoxSizer* setsChoiceSizer;
+  wxStaticBoxSizer* tileInfoBoxSizer;
 };
 
 #endif
