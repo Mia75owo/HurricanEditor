@@ -17,6 +17,7 @@ class TileSet : public wxPanel {
   }
 
   void Select(wxString name);
+  void SelectTile(int tileID);
   int SelectedTileID();
 
  private:
@@ -27,9 +28,12 @@ class TileSet : public wxPanel {
 
   void Render(wxDC& dc);
   void Resize(wxDC& dc);
+  int GetTileUnderCursor(wxPoint cursor);
 
   int size;
   int selectedTile;
+
+  wxPoint mousePos;
 
  protected:
   DECLARE_EVENT_TABLE()

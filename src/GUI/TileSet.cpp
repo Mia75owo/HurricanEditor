@@ -14,6 +14,14 @@ TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
     Refresh();
     evt.Skip();
   });
+  Bind(wxEVT_MOTION, [&](wxMouseEvent& evt) {
+    mousePos = evt.GetPosition();
+    evt.Skip();
+  });
+  Bind(wxEVT_LEFT_DOWN, [&](wxMouseEvent&) {
+    int tile = GetTileUnderCursor(mousePos);
+    SelectTile(tile);
+  });
 }
 
 bool TileSet::LoadTileSet(wxString path, wxBitmapType type) {
@@ -55,6 +63,30 @@ void TileSet::Select(wxString name) {
   Refresh();
 }
 
+void TileSet::SelectTile(int tileID) {
+  if (tileID < 0 || tileID >= 143)
+    return;
+
+  selectedTile = tileID;
+
+  Refresh();
+}
+
+int TileSet::GetTileUnderCursor(wxPoint cursor) {
+  const int tilesX = floor(TILESETSIZE_X / ORIGINAL_TILE_SIZE_X);
+  const int tilesY = floor(TILESETSIZE_Y / ORIGINAL_TILE_SIZE_Y);
+
+  const float tileSizeX = size / static_cast<float>(tilesX);
+  const float tileSizeY = size / static_cast<float>(tilesY);
+
+  const int selectedX = cursor.x / tileSizeX;
+  const int selectedY = cursor.y / tileSizeY;
+
+  const int selected = selectedY * tilesY + selectedX;
+
+  return selected;
+}
+
 void TileSet::Render(wxDC& dc) {
   dc.DrawBitmap(resized, 0, 0, false);
 
@@ -76,10 +108,10 @@ void TileSet::Render(wxDC& dc) {
 
   // Render selected highlight
   const int selectedX = selectedTile % tilesX;
-  const int selectedY = selectedTile % tilesY;
+  const int selectedY = selectedTile / tilesY;
 
   dc.SetBrush(wxBrush(wxColor(255, 255, 255, 100)));
-  dc.DrawRectangle(selectedX - width / 2.0f, selectedY - width / 2.0f, tileSizeX + width, tileSizeY + width);
+  dc.DrawRectangle(selectedX * tileSizeX - width / 2.0f, selectedY * tileSizeY - width / 2.0f, tileSizeX + width, tileSizeY + width);
 }
 void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
