@@ -7,6 +7,7 @@
 #include <wx/wx.h>
 
 #include "DX8Graphics.hpp"
+#include "GUI/App.hpp"
 #include "ObjectList.hpp"
 #include "Tileengine.hpp"
 #include "Timer.hpp"
@@ -64,6 +65,13 @@ TileCanvas::TileCanvas(wxWindow* parent)
 
       TileEngine.XOffset += delta.x;
       TileEngine.YOffset += delta.y;
+    }
+
+    if (mouseLeft) {
+      auto tileCords = GetTileCordsUnderCursor();
+      auto& tile = TileEngine.Tiles[tileCords.x][tileCords.y];
+      tile.FrontArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
+      tile.TileSetFront = frame->editMenu->tileSet->GetSelectedTileSetID();
     }
 
     mousePos = evt.GetPosition();

@@ -9,8 +9,8 @@ public:
   EditMenu(wxWindow* parent);
   void Init();
 
-private:
   TileSet* tileSet;
+private:
 
   wxPanel* controls;
   wxChoice* setsChoice;
