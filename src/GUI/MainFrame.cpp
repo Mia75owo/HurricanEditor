@@ -32,12 +32,20 @@ MainFrame::MainFrame(const wxString& title)
   menuBar->Append(menuEditor, "&Editor");
   SetMenuBar(menuBar);
 
-  Bind(
-      wxEVT_MENU, [&](auto&) { LoadLevel(); }, ID_LOAD);
-  Bind(
-      wxEVT_MENU, [&](auto&) { SaveLevel(); }, ID_SAVE);
-  Bind(
-      wxEVT_MENU, [&](auto&) { ResetZoom(); }, ID_RESET_ZOOM);
+  // clang-format off
+  Bind(wxEVT_MENU, [&](auto&) { LoadLevel(); }, ID_LOAD);
+  Bind(wxEVT_MENU, [&](auto&) { SaveLevel(); }, ID_SAVE);
+
+  Bind(wxEVT_MENU, [&](auto&) { ResetZoom(); }, ID_RESET_ZOOM);
+  Bind(wxEVT_MENU, [&](auto&) { canvas->editMode = EDIT_MODE_FRONT; },
+      ID_EDITOR_MODE_FRONT);
+  Bind(wxEVT_MENU, [&](auto&) { canvas->editMode = EDIT_MODE_BACK; },
+      ID_EDITOR_MODE_BACK);
+  Bind(wxEVT_MENU, [&](auto&) { canvas->editMode = EDIT_MODE_OBJECTS; },
+      ID_EDITOR_MODE_OBJECTS);
+  Bind(wxEVT_MENU, [&](auto&) { canvas->editMode = EDIT_MODE_VIEW; },
+      ID_EDITOR_MODE_VIEW);
+  // clang-format on
 
   mainSplitter =
       new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
