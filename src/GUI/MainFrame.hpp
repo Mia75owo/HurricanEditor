@@ -16,6 +16,10 @@ class MainFrame : public wxFrame {
   EditMenu* editMenu;
 
  private:
+  void LoadLevel();
+  void SaveLevel();
+  void ResetZoom();
+
   wxSplitterWindow* mainSplitter;
   wxSizer* sizer;
 };
