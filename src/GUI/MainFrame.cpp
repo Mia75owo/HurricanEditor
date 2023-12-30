@@ -17,6 +17,10 @@ MainFrame::MainFrame(const wxString& title)
   menuFile->Append(wxID_EXIT);
   auto menuEditor = new wxMenu;
   menuEditor->Append(ID_RESET_ZOOM, "&Reset Zoom", "Sets the Zoom of the Level back to 1.0");
+  menuEditor->Append(ID_EDITOR_MODE_FRONT, "&EM: front", "Changes the editor mode to 'front'");
+  menuEditor->Append(ID_EDITOR_MODE_BACK, "&EM: back", "Changes the editor mode to 'back'");
+  menuEditor->Append(ID_EDITOR_MODE_OBJECTS, "&EM: objects", "Changes the editor mode to 'objects'");
+  menuEditor->Append(ID_EDITOR_MODE_VIEW, "&EM: view", "Changes the editor mode to 'view'");
 
   auto menuBar = new wxMenuBar;
   menuBar->Append(menuFile, "&File");
