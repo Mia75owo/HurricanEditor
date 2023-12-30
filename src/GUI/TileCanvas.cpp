@@ -80,15 +80,16 @@ TileCanvas::TileCanvas(wxWindow* parent)
 }
 
 wxPoint TileCanvas::GetTileCordsUnderCursor() {
-  const wxPoint scaledOffset =
-      wxPoint(TileEngine.XOffset / TileEngine.TileSizeX,
-              TileEngine.YOffset / TileEngine.TileSizeY);
-  const wxPoint scaledMouse = wxPoint(mousePos.x / TileEngine.TileSizeX,
-                                      mousePos.y / TileEngine.TileSizeY);
+  const float scaledOffsetX = TileEngine.XOffset / TileEngine.TileSizeX;
+  const float scaledOffsetY = TileEngine.YOffset / TileEngine.TileSizeY;
 
-  const wxPoint relative = scaledMouse + scaledOffset;
+  const float scaledMouseX = mousePos.x / TileEngine.TileSizeX;
+  const float scaledMouseY = mousePos.y / TileEngine.TileSizeY;
 
-return relative;
+  const float relativeX = scaledMouseX + scaledOffsetX;
+  const float relativeY = scaledMouseY + scaledOffsetY;
+
+  return wxPoint(relativeX, relativeY);
 }
 
 void TileCanvas::Update() {
