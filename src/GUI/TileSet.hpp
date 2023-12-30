@@ -17,6 +17,7 @@ class TileSet : public wxPanel {
   }
 
   void Select(wxString name);
+  int SelectedTileID();
 
  private:
   std::map<wxString, wxImage> images;
@@ -28,6 +29,7 @@ class TileSet : public wxPanel {
   void Resize(wxDC& dc);
 
   int size;
+  int selectedTile;
 
  protected:
   DECLARE_EVENT_TABLE()

@@ -9,6 +9,7 @@ EVT_PAINT(TileSet::PaintIt)
 END_EVENT_TABLE()
 
 TileSet::TileSet(wxWindow* parent) : wxPanel(parent) {
+  selectedTile = 0;
   Bind(wxEVT_SIZE, [&](wxSizeEvent& evt) {
     Refresh();
     evt.Skip();
@@ -57,6 +58,7 @@ void TileSet::Select(wxString name) {
 void TileSet::Render(wxDC& dc) {
   dc.DrawBitmap(resized, 0, 0, false);
 
+  // Render grid
   const int tilesX = floor(TILESETSIZE_X / ORIGINAL_TILE_SIZE_X);
   const int tilesY = floor(TILESETSIZE_Y / ORIGINAL_TILE_SIZE_Y);
 
@@ -71,6 +73,13 @@ void TileSet::Render(wxDC& dc) {
   for (int i = 1; i < tilesY; i++) {
     dc.DrawRectangle(0, i * tileSizeY - width / 2.0f, size, width);
   }
+
+  // Render selected highlight
+  const int selectedX = selectedTile % tilesX;
+  const int selectedY = selectedTile % tilesY;
+
+  dc.SetBrush(wxBrush(wxColor(255, 255, 255, 100)));
+  dc.DrawRectangle(selectedX - width / 2.0f, selectedY - width / 2.0f, tileSizeX + width, tileSizeY + width);
 }
 void TileSet::Resize(wxDC& dc) {
   int newSize = dc.GetSize().GetWidth();
