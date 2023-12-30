@@ -81,6 +81,7 @@ TileCanvas::TileCanvas(wxWindow* parent)
         case EDIT_MODE_BACK:
           tile.BackArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
           tile.TileSetBack = frame->editMenu->tileSet->GetSelectedTileSetID();
+          tile.Block = BLOCKWERT_WAND;
           break;
         case EDIT_MODE_OBJECTS:
         case EDIT_MODE_VIEW:
@@ -129,28 +130,28 @@ void TileCanvas::Render() {
   TileEngine.DrawBackground();
 
   switch (editMode) {
-    case EDIT_MODE_FRONT:
+    case EDIT_MODE_FRONT: {
       TileEngine.DrawFrontLevel();
       ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
                                 TileEngine.Scale);
       TileEngine.DrawOverlayLevel();
-      break;
-    case EDIT_MODE_BACK:
+    } break;
+    case EDIT_MODE_BACK: {
       TileEngine.DrawBackLevel();
       ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
                                 TileEngine.Scale);
       TileEngine.DrawWater();
       TileEngine.DrawBackLevelOverlay();
-      break;
-    case EDIT_MODE_OBJECTS:
+    } break;
+    case EDIT_MODE_OBJECTS: {
       TileEngine.DrawBackLevel();
       TileEngine.DrawFrontLevel();
       ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
                                 TileEngine.Scale);
       TileEngine.DrawBackLevelOverlay();
       TileEngine.DrawWater();
-      break;
-    case EDIT_MODE_VIEW:
+    } break;
+    case EDIT_MODE_VIEW: {
       TileEngine.DrawBackLevel();
       TileEngine.DrawFrontLevel();
 
@@ -161,6 +162,10 @@ void TileCanvas::Render() {
       TileEngine.DrawBackLevelOverlay();
       TileEngine.DrawOverlayLevel();
       // TileEngine.DrawShadow();
+    } break;
+
+    default:
+      Protokoll << "ERROR" << std::endl;
       break;
   }
 
