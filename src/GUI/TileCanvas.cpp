@@ -34,6 +34,8 @@ TileCanvas::TileCanvas(wxWindow* parent)
   TileEngine.LoadSprites();
   TileEngine.LoadLevel(g_storage_ext + "/data/levels/jungle.map");
 
+  editMode = EDIT_MODE_VIEW;
+
   Bind(wxEVT_SIZE, [&](wxSizeEvent& evt) {
     auto size = this->GetSize();
     DirectGraphics.ResizeToWindow(size.GetWidth(), size.GetHeight());
@@ -70,8 +72,20 @@ TileCanvas::TileCanvas(wxWindow* parent)
     if (mouseLeft) {
       auto tileCords = GetTileCordsUnderCursor();
       auto& tile = TileEngine.Tiles[tileCords.x][tileCords.y];
-      tile.FrontArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
-      tile.TileSetFront = frame->editMenu->tileSet->GetSelectedTileSetID();
+
+      switch (editMode) {
+        case EDIT_MODE_FRONT:
+          tile.FrontArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
+          tile.TileSetFront = frame->editMenu->tileSet->GetSelectedTileSetID();
+          break;
+        case EDIT_MODE_BACK:
+          tile.BackArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
+          tile.TileSetBack = frame->editMenu->tileSet->GetSelectedTileSetID();
+          break;
+        case EDIT_MODE_OBJECTS:
+        case EDIT_MODE_VIEW:
+          break;
+      }
     }
 
     mousePos = evt.GetPosition();
@@ -114,18 +128,40 @@ void TileCanvas::Render() {
 
   TileEngine.DrawBackground();
 
-  TileEngine.DrawBackLevel();
-  TileEngine.DrawFrontLevel();
+  switch (editMode) {
+    case EDIT_MODE_FRONT:
+      TileEngine.DrawFrontLevel();
+      ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
+                                TileEngine.Scale);
+      TileEngine.DrawOverlayLevel();
+      break;
+    case EDIT_MODE_BACK:
+      TileEngine.DrawBackLevel();
+      ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
+                                TileEngine.Scale);
+      TileEngine.DrawWater();
+      TileEngine.DrawBackLevelOverlay();
+      break;
+    case EDIT_MODE_OBJECTS:
+      TileEngine.DrawBackLevel();
+      TileEngine.DrawFrontLevel();
+      ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
+                                TileEngine.Scale);
+      TileEngine.DrawWater();
+      break;
+    case EDIT_MODE_VIEW:
+      TileEngine.DrawBackLevel();
+      TileEngine.DrawFrontLevel();
 
-  ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
-                            TileEngine.Scale);
+      ObjectList.DrawAllObjects(TileEngine.XOffset, TileEngine.YOffset,
+                                TileEngine.Scale);
 
-  DirectGraphics.SetColorKeyMode();
-
-  TileEngine.DrawWater();
-  TileEngine.DrawBackLevelOverlay();
-  TileEngine.DrawOverlayLevel();
-  // TileEngine.DrawShadow();
+      TileEngine.DrawWater();
+      TileEngine.DrawBackLevelOverlay();
+      TileEngine.DrawOverlayLevel();
+      // TileEngine.DrawShadow();
+      break;
+  }
 
   glFlush();
   SwapBuffers();

@@ -6,12 +6,21 @@
 #include <wx/glcanvas.h>
 #include <wx/wx.h>
 
+enum EditMode {
+  EDIT_MODE_FRONT,
+  EDIT_MODE_BACK,
+  EDIT_MODE_OBJECTS,
+  EDIT_MODE_VIEW,
+};
+
 class TileCanvas : public wxGLCanvas {
  public:
   TileCanvas(wxWindow* parent);
   void PaintIt(wxPaintEvent&) { Update(); Render(); }
 
   wxPoint GetTileCordsUnderCursor();
+
+  EditMode editMode;
 
 private:
   void Update();
