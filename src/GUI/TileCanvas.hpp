@@ -5,6 +5,7 @@
 
 #include <wx/glcanvas.h>
 #include <wx/wx.h>
+#include "Tileengine.hpp"
 
 enum EditMode {
   EDIT_MODE_FRONT,
@@ -25,6 +26,11 @@ class TileCanvas : public wxGLCanvas {
 private:
   void Update();
   void Render();
+
+  void PlaceBlock(wxPoint pos, LevelTileStruct tile);
+  void PlaceTileFront(wxPoint pos, unsigned char art, unsigned char tileSet, uint32_t flags);
+  void PlaceTileBack(wxPoint pos, unsigned char art, unsigned char tileSet, uint32_t flags);
+
   wxGLContext* context;
 
   wxPoint mousePos;

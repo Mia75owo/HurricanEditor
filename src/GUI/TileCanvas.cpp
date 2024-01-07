@@ -70,19 +70,25 @@ TileCanvas::TileCanvas(wxWindow* parent)
     }
 
     if (mouseLeft) {
-      auto tileCords = GetTileCordsUnderCursor();
-      auto& tile = TileEngine.Tiles[tileCords.x][tileCords.y];
+      auto pos = GetTileCordsUnderCursor();
+      auto& tileSet = frame->editMenu->tileSet;
 
       switch (editMode) {
         case EDIT_MODE_FRONT:
-          tile.FrontArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
-          tile.TileSetFront = frame->editMenu->tileSet->GetSelectedTileSetID();
-          tile.Block = frame->editMenu->getBlockFlags();
+          PlaceTileFront(                                       // foreground
+              pos,                                              // tile position
+              tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
+              tileSet->GetSelectedTileSetID(),                  // tile set
+              frame->editMenu->getBlockFlags()                  // flags
+          );
           break;
         case EDIT_MODE_BACK:
-          tile.BackArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
-          tile.TileSetBack = frame->editMenu->tileSet->GetSelectedTileSetID();
-          tile.Block = frame->editMenu->getBlockFlags();
+          PlaceTileBack(                                        // background
+              pos,                                              // tile position
+              tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
+              tileSet->GetSelectedTileSetID(),                  // tile set
+              frame->editMenu->getBlockFlags()                  // flags
+          );
           break;
         case EDIT_MODE_OBJECTS:
         case EDIT_MODE_VIEW:
@@ -101,6 +107,23 @@ TileCanvas::TileCanvas(wxWindow* parent)
     }
     evt.Skip();
   });
+}
+
+void TileCanvas::PlaceBlock(wxPoint pos, LevelTileStruct tile) {
+  TileEngine.Tiles[pos.x][pos.y] = tile;
+}
+
+void TileCanvas::PlaceTileFront(wxPoint pos, unsigned char art,
+                                unsigned char tileSet, uint32_t flags) {
+  TileEngine.Tiles[pos.x][pos.y].FrontArt = art;
+  TileEngine.Tiles[pos.x][pos.y].TileSetFront = tileSet;
+  TileEngine.Tiles[pos.x][pos.y].Block = flags;
+}
+void TileCanvas::PlaceTileBack(wxPoint pos, unsigned char art,
+                               unsigned char tileSet, uint32_t flags) {
+  TileEngine.Tiles[pos.x][pos.y].BackArt = art;
+  TileEngine.Tiles[pos.x][pos.y].TileSetBack = tileSet;
+  TileEngine.Tiles[pos.x][pos.y].Block = flags;
 }
 
 wxPoint TileCanvas::GetTileCordsUnderCursor() {
