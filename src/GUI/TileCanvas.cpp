@@ -46,6 +46,7 @@ TileCanvas::TileCanvas(wxWindow* parent)
   mouseRight = false;
   Bind(wxEVT_LEFT_DOWN, [&](wxMouseEvent& evt) {
     mouseLeft = true;
+      TryPlace();
     evt.Skip();
   });
   Bind(wxEVT_LEFT_UP, [&](wxMouseEvent& evt) {
@@ -70,29 +71,7 @@ TileCanvas::TileCanvas(wxWindow* parent)
     }
 
     if (mouseLeft) {
-      auto pos = GetTileCordsUnderCursor();
-      auto& tileSet = frame->editMenu->tileSet;
-
-      switch (editMode) {
-        case EDIT_MODE_FRONT:
-          PlaceTileFront(                                       // foreground
-              pos,                                              // tile position
-              tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
-              tileSet->GetSelectedTileSetID(),                  // tile set
-              frame->editMenu->getBlockFlags()                  // flags
-          );
-          break;
-        case EDIT_MODE_BACK:
-          PlaceTileBack(                                        // background
-              pos,                                              // tile position
-              tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
-              tileSet->GetSelectedTileSetID(),                  // tile set
-              frame->editMenu->getBlockFlags()                  // flags
-          );
-          break;
-        case EDIT_MODE_OBJECTS:
-        case EDIT_MODE_VIEW:
-          break;
+        TryPlace();
       }
     }
 
@@ -124,6 +103,33 @@ void TileCanvas::PlaceTileBack(wxPoint pos, unsigned char art,
   TileEngine.Tiles[pos.x][pos.y].BackArt = art;
   TileEngine.Tiles[pos.x][pos.y].TileSetBack = tileSet;
   TileEngine.Tiles[pos.x][pos.y].Block = flags;
+}
+
+void TileCanvas::TryPlace() {
+  auto pos = GetTileCordsUnderCursor();
+  auto& tileSet = frame->editMenu->tileSet;
+
+  switch (editMode) {
+    case EDIT_MODE_FRONT:
+      PlaceTileFront(                                       // foreground
+          pos,                                              // tile position
+          tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
+          tileSet->GetSelectedTileSetID(),                  // tile set
+          frame->editMenu->getBlockFlags()                  // flags
+      );
+      break;
+    case EDIT_MODE_BACK:
+      PlaceTileBack(                                        // background
+          pos,                                              // tile position
+          tileSet->GetSelectedTileID() + INCLUDE_ZEROTILE,  // art
+          tileSet->GetSelectedTileSetID(),                  // tile set
+          frame->editMenu->getBlockFlags()                  // flags
+      );
+      break;
+    case EDIT_MODE_OBJECTS:
+    case EDIT_MODE_VIEW:
+      break;
+  }
 }
 
 wxPoint TileCanvas::GetTileCordsUnderCursor() {
