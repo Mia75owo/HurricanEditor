@@ -46,7 +46,11 @@ TileCanvas::TileCanvas(wxWindow* parent)
   mouseRight = false;
   Bind(wxEVT_LEFT_DOWN, [&](wxMouseEvent& evt) {
     mouseLeft = true;
+    if (evt.AltDown()) {
+      TryRemove();
+    } else {
       TryPlace();
+    }
     evt.Skip();
   });
   Bind(wxEVT_LEFT_UP, [&](wxMouseEvent& evt) {
@@ -71,6 +75,9 @@ TileCanvas::TileCanvas(wxWindow* parent)
     }
 
     if (mouseLeft) {
+      if (evt.AltDown()) {
+        TryRemove();
+      } else {
         TryPlace();
       }
     }
@@ -105,6 +112,31 @@ void TileCanvas::PlaceTileBack(wxPoint pos, unsigned char art,
   TileEngine.Tiles[pos.x][pos.y].Block = flags;
 }
 
+void TileCanvas::RemoveTileFront(wxPoint pos) {
+  TileEngine.Tiles[pos.x][pos.y].FrontArt = 0;
+  TileEngine.Tiles[pos.x][pos.y].TileSetFront = 0;
+  if (TileEngine.Tiles[pos.x][pos.y].BackArt == 0) {
+    TileEngine.Tiles[pos.x][pos.y].Block = 0;
+  } else {
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_VERDECKEN;
+  }
+}
+void TileCanvas::RemoveTileBack(wxPoint pos) {
+  TileEngine.Tiles[pos.x][pos.y].BackArt = 0;
+  TileEngine.Tiles[pos.x][pos.y].TileSetBack = 0;
+  if (TileEngine.Tiles[pos.x][pos.y].FrontArt == 0) {
+    TileEngine.Tiles[pos.x][pos.y].Block = 0;
+  } else {
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_WAND;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_EIS;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_SUMPF;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_LIQUID;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_WASSER;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_PLATTFORM;
+    TileEngine.Tiles[pos.x][pos.y].Block &= ~BLOCKWERT_DESTRUCTIBLE;
+  }
+}
+
 void TileCanvas::TryPlace() {
   auto pos = GetTileCordsUnderCursor();
   auto& tileSet = frame->editMenu->tileSet;
@@ -125,6 +157,22 @@ void TileCanvas::TryPlace() {
           tileSet->GetSelectedTileSetID(),                  // tile set
           frame->editMenu->getBlockFlags()                  // flags
       );
+      break;
+    case EDIT_MODE_OBJECTS:
+    case EDIT_MODE_VIEW:
+      break;
+  }
+}
+
+void TileCanvas::TryRemove() {
+  auto pos = GetTileCordsUnderCursor();
+
+  switch (editMode) {
+    case EDIT_MODE_FRONT:
+      RemoveTileFront(pos);
+      break;
+    case EDIT_MODE_BACK:
+      RemoveTileBack(pos);
       break;
     case EDIT_MODE_OBJECTS:
     case EDIT_MODE_VIEW:

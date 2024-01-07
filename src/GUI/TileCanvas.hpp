@@ -36,15 +36,19 @@ class TileCanvas : public wxGLCanvas {
   void PlaceTileBack(wxPoint pos, unsigned char art, unsigned char tileSet,
                      uint32_t flags);
 
+  void RemoveTileFront(wxPoint pos);
+  void RemoveTileBack(wxPoint pos);
 
   void TryPlace();
+  void TryRemove();
+
   wxGLContext* context;
 
   wxPoint mousePos;
   bool mouseLeft;
   bool mouseRight;
 
-protected:
+ protected:
   DECLARE_EVENT_TABLE()
 };
 
