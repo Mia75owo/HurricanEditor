@@ -77,11 +77,12 @@ TileCanvas::TileCanvas(wxWindow* parent)
         case EDIT_MODE_FRONT:
           tile.FrontArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
           tile.TileSetFront = frame->editMenu->tileSet->GetSelectedTileSetID();
+          tile.Block = frame->editMenu->getBlockFlags();
           break;
         case EDIT_MODE_BACK:
           tile.BackArt = frame->editMenu->tileSet->GetSelectedTileID() + 1;
           tile.TileSetBack = frame->editMenu->tileSet->GetSelectedTileSetID();
-          tile.Block = BLOCKWERT_WAND;
+          tile.Block = frame->editMenu->getBlockFlags();
           break;
         case EDIT_MODE_OBJECTS:
         case EDIT_MODE_VIEW:
