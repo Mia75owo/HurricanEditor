@@ -12,6 +12,7 @@ class EditMenu : public wxPanel {
  public:
   EditMenu(wxWindow* parent);
   void Init();
+  uint32_t getBlockFlags();
 
   TileSet* tileSet;
 

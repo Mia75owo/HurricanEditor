@@ -125,3 +125,33 @@ void EditMenu::Init() {
     evt.Skip();
   });
 }
+
+uint32_t EditMenu::getBlockFlags() {
+  uint32_t flags = 0;
+
+  flags |= BLOCKWERT_WAND & wall->IsChecked();
+  flags |= BLOCKWERT_GEGNERWAND & enemyWall->IsChecked();
+  flags |= BLOCKWERT_PLATTFORM & platform->IsChecked();
+  flags |= BLOCKWERT_LIGHT & light->IsChecked();
+  flags |= BLOCKWERT_VERDECKEN & overlay->IsChecked();
+  flags |= BLOCKWERT_ANIMIERT_BACK & animatedBack->IsChecked();
+  flags |= BLOCKWERT_ANIMIERT_FRONT & animatedFront->IsChecked();
+  flags |= BLOCKWERT_WASSER & water->IsChecked();
+  flags |= BLOCKWERT_SCHADEN & damage->IsChecked();
+  flags |= BLOCKWERT_FLIESSBANDL & conveyorL->IsChecked();
+  flags |= BLOCKWERT_FLIESSBANDR & conveyorR->IsChecked();
+  flags |= BLOCKWERT_WENDEPUNKT & turn->IsChecked();
+  flags |= BLOCKWERT_DESTRUCTIBLE & destroyable->IsChecked();
+  flags |= BLOCKWERT_MOVELINKS & moveL->IsChecked();
+  flags |= BLOCKWERT_OVERLAY_LIGHT & overlayLight->IsChecked();
+  flags |= BLOCKWERT_SUMPF & swamp->IsChecked();
+  flags |= BLOCKWERT_EIS & ice->IsChecked();
+  flags |= BLOCKWERT_MOVEVERTICAL & moveD->IsChecked();
+  flags |= BLOCKWERT_WASSERFALL & waterfall->IsChecked();
+  flags |= BLOCKWERT_MOVERECHTS & moveR->IsChecked();
+  flags |= BLOCKWERT_SCHRAEGE_L & slopeL->IsChecked();
+  flags |= BLOCKWERT_SCHRAEGE_R & slopeR->IsChecked();
+  flags |= BLOCKWERT_LIQUID & liquid->IsChecked();
+
+  return flags;
+}
