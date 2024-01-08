@@ -29,6 +29,7 @@ class TileCanvas : public wxGLCanvas {
  private:
   void Update();
   void Render();
+  void DrawGrid();
 
   void PlaceBlock(wxPoint pos, LevelTileStruct tile);
   void PlaceTileFront(wxPoint pos, unsigned char art, unsigned char tileSet,

@@ -7,6 +7,7 @@
 #include <wx/wx.h>
 
 #include "DX8Graphics.hpp"
+#include "DX8Sprite.hpp"
 #include "GUI/App.hpp"
 #include "ObjectList.hpp"
 #include "Tileengine.hpp"
@@ -247,6 +248,24 @@ void TileCanvas::Render() {
       break;
   }
 
+  DrawGrid();
+
   glFlush();
   SwapBuffers();
+}
+
+void TileCanvas::DrawGrid() {
+  const int tilesX = DirectGraphics.RenderWidth / TileEngine.TileSizeX;
+  const int tilesY = DirectGraphics.RenderHeight / TileEngine.TileSizeY;
+
+  const float squareSizeX = TileEngine.TileSizeX / 15.0f;
+  const float squareSizeY = TileEngine.TileSizeY / 15.0f;
+
+  for (int x = 1; x < tilesX + 2; x++) {
+    for (int y = 1; y < tilesY + 2; y++) {
+      const float posX = (TileEngine.TileSizeX * x) - fmod(TileEngine.XOffset, TileEngine.TileSizeX);
+      const float posY = (TileEngine.TileSizeY * y) - fmod(TileEngine.YOffset, TileEngine.TileSizeY);
+      RenderRect(posX, posY, squareSizeX, squareSizeY, 0xff0000ff);
+    }
+  }
 }
