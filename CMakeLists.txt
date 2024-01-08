@@ -20,8 +20,19 @@ else()
     message(WARNING "IPO is not supported: ${output}")
 endif()
 
+        #src/Main.cpp
 set(EDITOR_SOURCES
-        src/Main.cpp
+        src/GUI/App.cpp
+        src/GUI/App.hpp
+        src/GUI/EditMenu.cpp
+        src/GUI/EditMenu.hpp
+        src/GUI/IDs.hpp
+        src/GUI/MainFrame.cpp
+        src/GUI/MainFrame.hpp
+        src/GUI/TileCanvas.cpp
+        src/GUI/TileCanvas.hpp
+        src/GUI/TileSet.cpp
+        src/GUI/TileSet.hpp
 
         src/ObjectList.cpp
         src/ObjectList.hpp
@@ -91,9 +102,7 @@ if (SDL2_FOUND)
 endif()
 
 find_package(LibEpoxy 1.2 REQUIRED)
-
 include_directories(${LibEpoxy_INCLUDE_DIRS})
-
 target_link_libraries(${PROJECT_NAME} ${LibEpoxy_LIBRARIES})
 
 if (SDL2_FOUND)
@@ -110,6 +119,11 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSI
     target_link_libraries(${PROJECT_NAME} c++fs)
 endif()
 
+#target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/IncludeEpoxy.hpp)
+
+find_package(wxWidgets REQUIRED COMPONENTS net core base gl)
+include(${wxWidgets_USE_FILE})
+target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 
 if(UNIX)
     install(PROGRAMS  ${CMAKE_BINARY_DIR}/hurrican   DESTINATION bin/)

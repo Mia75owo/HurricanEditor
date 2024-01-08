@@ -84,7 +84,6 @@ class DirectGraphicsClass {
     glm::mat4x4 matProjWindow;
     glm::mat4x4 matProjRender;
 
-    SDL_Window *Window;
     SDL_GLContext GLcontext;
     SDL_Rect WindowView;
     SDL_Rect RenderRect;
@@ -92,14 +91,12 @@ class DirectGraphicsClass {
   public:
     int RenderWidth;
     int RenderHeight;
-    void ResizeToWindow();
-
-    void ShowBackBuffer();  // Present aufrufen
+    void ResizeToWindow(int width, int height);
 
     DirectGraphicsClass();   // Konstruktor
     ~DirectGraphicsClass();  // Desktruktor
 
-    bool Init(std::uint32_t dwBreite, std::uint32_t dwHoehe, std::uint32_t dwZ_Bits, bool VSync);
+    bool Init();
     bool Exit();  // D3D beenden
     bool SetDeviceInfo();
 
@@ -112,8 +109,6 @@ class DirectGraphicsClass {
                         std::uint32_t PrimitiveCount,  // eines jeden Frames komplett in
                         void *pVertexStreamZeroData);  // den Backbuffer gerendert wird
 
-    void DisplayBuffer();  // Render den Buffer auf den Backbuffer
-    // DKS - SetTexture is now used for both GL and DirectX, and uses new TexturesystemClass:
     void SetTexture(int idx);
     bool ExtensionSupported(const char *ext);
     void SetupFramebuffers();

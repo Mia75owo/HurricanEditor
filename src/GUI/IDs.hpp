@@ -1,0 +1,15 @@
+#ifndef IDS_HPP_
+#define IDS_HPP_
+
+enum IDs {
+  ID_LOAD = 2,
+  ID_SAVE = 3,
+  ID_RESET_ZOOM = 4,
+  ID_TILESET_CHOICE = 5,
+  ID_EDITOR_MODE_FRONT = 6,
+  ID_EDITOR_MODE_BACK = 7,
+  ID_EDITOR_MODE_OBJECTS = 8,
+  ID_EDITOR_MODE_VIEW = 9,
+};
+
+#endif

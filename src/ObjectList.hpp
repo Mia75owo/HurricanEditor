@@ -38,4 +38,6 @@ public:
 private:
 };
 
+extern ObjectListClass ObjectList;
+
 #endif

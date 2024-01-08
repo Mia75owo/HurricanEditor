@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <string>
 #include <algorithm>
+#include <utility>
 #include "Gegner.hpp"
 #include "ObjectList.hpp"
 namespace fs = std::filesystem;
@@ -158,6 +159,32 @@ void TileEngineClass::Zoom(float times) {
 
     Scale *= times;
 }
+void TileEngineClass::ZoomBy(float times) {
+    float OriginalScale = Scale;
+
+    Scale += times;
+
+    CalcRenderRange();
+
+    // Cap the zoom
+    if (times < 1.0f && LEVELPIXELSIZE_X <= DirectGraphics.RenderWidth
+      ||times < 1.0f && LEVELPIXELSIZE_Y <= DirectGraphics.RenderHeight) {
+        Scale = OriginalScale;
+        CalcRenderRange();
+        return;
+    }
+
+    Scale = OriginalScale;
+
+    // Center screen again
+    const float aspect = (Scale + times) / Scale;
+    const float screenaspectx = (DirectGraphics.RenderWidth * aspect) - DirectGraphics.RenderWidth;
+    const float screenaspecty = (DirectGraphics.RenderHeight * aspect) - DirectGraphics.RenderHeight;
+    XOffset = XOffset * aspect + screenaspectx / 2.0f;
+    YOffset = YOffset * aspect + screenaspecty / 2.0f;
+
+    Scale += times;
+}
 
 // --------------------------------------------------------------------------------------
 // Neues, leeres Level der Grösse xSize/ySize erstellen
@@ -222,8 +249,13 @@ bool TileEngineClass::LoadLevel(const std::string &Filename) {
     bScrollBackground = DateiHeader.ScrollBackground;
 
     // Benutzte Tilesets laden
-    for (int i = 0; i < LoadedTilesets; i++)
+    for (int i = 0; i < LoadedTilesets; i++) {
         TileGfx[i].LoadImage(DateiHeader.SetNames[i], 256, 256, TileSizeX, TileSizeY, 12, 12);
+        std::string str = DateiHeader.SetNames[i];
+        if (!str.empty()) {
+            LoadedTilesetPathsWithID.push_back(std::make_pair(str, i));
+        }
+    }
 
     // Benutzte Hintergrundgrafiken laden
 
