@@ -20,7 +20,6 @@ else()
     message(WARNING "IPO is not supported: ${output}")
 endif()
 
-        #src/Main.cpp
 set(EDITOR_SOURCES
         src/GUI/App.cpp
         src/GUI/App.hpp
